@@ -94,13 +94,13 @@ func part2(lines []Line) int {
 				continue
 			}
 
-			found := false
 			for j := 3; j < 6; j++ {
-				if index+j > end {
+				edge := index + j
+				if edge > end {
 					break
 				}
 
-				value, ok := digits[line[index:index+j]]
+				value, ok := digits[line[index:edge]]
 				if ok {
 					digit = value
 					if !haveFirst {
@@ -108,15 +108,11 @@ func part2(lines []Line) int {
 						haveFirst = true
 					}
 
-					index += j
-					found = true
 					break
 				}
 			}
 
-			if !found {
-				index++
-			}
+			index++
 		}
 
 		number += int(digit - delta)
