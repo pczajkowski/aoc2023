@@ -70,6 +70,46 @@ func readInput(file *os.File) []Game {
 	return games
 }
 
+type Limits struct {
+	red, green, blue int
+}
+
+func checkLimits(sets [][]Cube, limits Limits) bool {
+	for i := range sets {
+		for j := range sets[i] {
+			switch sets[i][j].color {
+			case "red":
+				if sets[i][j].count > limits.red {
+					return false
+				}
+			case "green":
+				if sets[i][j].count > limits.green {
+					return false
+				}
+			case "blue":
+				if sets[i][j].count > limits.blue {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
+func part1(games []Game) int {
+	limits := Limits{red: 12, green: 13, blue: 14}
+	var result int
+
+	for i := range games {
+		if checkLimits(games[i].sets, limits) {
+			result += games[i].id
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -83,5 +123,5 @@ func main() {
 	}
 
 	games := readInput(file)
-	fmt.Println(games)
+	fmt.Println("Part1:", part1(games))
 }
