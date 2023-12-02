@@ -110,6 +110,41 @@ func part1(games []Game) int {
 	return result
 }
 
+func getLimits(sets [][]Cube) Limits {
+	var limits Limits
+	for i := range sets {
+		for j := range sets[i] {
+			switch sets[i][j].color {
+			case "red":
+				if sets[i][j].count > limits.red {
+					limits.red = sets[i][j].count
+				}
+			case "green":
+				if sets[i][j].count > limits.green {
+					limits.green = sets[i][j].count
+				}
+			case "blue":
+				if sets[i][j].count > limits.blue {
+					limits.blue = sets[i][j].count
+				}
+			}
+		}
+	}
+
+	return limits
+}
+
+func part2(games []Game) int {
+	var result int
+
+	for i := range games {
+		limits := getLimits(games[i].sets)
+		result += limits.red * limits.green * limits.blue
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -124,4 +159,5 @@ func main() {
 
 	games := readInput(file)
 	fmt.Println("Part1:", part1(games))
+	fmt.Println("Part2:", part2(games))
 }
