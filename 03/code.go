@@ -40,6 +40,10 @@ func symbolNear(lines []string, height int, width int, y int, start int, end int
 		i = start
 	}
 
+	if end >= width {
+		end = width - 1
+	}
+
 	canGoUp := y-1 >= 0
 	canGoDown := y+1 < height
 
@@ -64,14 +68,21 @@ func part1(lines []string) int {
 	var result int
 	height := len(lines)
 	width := len(lines[0])
+	edge := width - 1
 	for i := range lines {
 		var start, end int
 		gotNumber := false
+		tryRead := false
 		for j := range lines[i] {
 			if isDigit(lines[i][j]) {
 				if !gotNumber {
 					start = j
 					gotNumber = true
+				}
+
+				if j == edge {
+					end = j + 1
+					tryRead = true
 				}
 			} else {
 				if !gotNumber {
@@ -80,6 +91,10 @@ func part1(lines []string) int {
 
 				end = j
 				gotNumber = false
+				tryRead = true
+			}
+
+			if tryRead {
 				if symbolNear(lines, height, width, i, start, end) {
 					var d int
 					n, err := fmt.Sscanf(lines[i][start:end], "%d", &d)
@@ -89,6 +104,8 @@ func part1(lines []string) int {
 
 					result += d
 				}
+
+				tryRead = false
 			}
 
 		}
