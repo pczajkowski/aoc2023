@@ -64,6 +64,16 @@ func symbolNear(lines []string, height int, width int, y int, start int, end int
 	return false
 }
 
+func numberFromLine(lines []string, index int, start int, end int) int {
+	var number int
+	n, err := fmt.Sscanf(lines[index][start:end], "%d", &number)
+	if n != 1 || err != nil {
+		log.Fatalf("Wrong input: %s\n%s", lines[index][start:end], err)
+	}
+
+	return number
+}
+
 func part1(lines []string) int {
 	var result int
 	height := len(lines)
@@ -96,13 +106,7 @@ func part1(lines []string) int {
 
 			if tryRead {
 				if symbolNear(lines, height, width, i, start, end) {
-					var d int
-					n, err := fmt.Sscanf(lines[i][start:end], "%d", &d)
-					if n != 1 || err != nil {
-						log.Fatalf("Wrong input: %s\n%s", lines[i][start:end], err)
-					}
-
-					result += d
+					result += numberFromLine(lines, i, start, end)
 				}
 
 				tryRead = false
@@ -184,13 +188,7 @@ func numberFromPoint(lines []string, width int, point Point) int {
 	}
 	end++
 
-	var d int
-	n, err := fmt.Sscanf(lines[point.y][start:end], "%d", &d)
-	if n != 1 || err != nil {
-		log.Fatalf("Wrong input: %s\n%s", lines[point.y][start:end], err)
-	}
-
-	return d
+	return numberFromLine(lines, point.y, start, end)
 }
 
 func part2(lines []string) int {
