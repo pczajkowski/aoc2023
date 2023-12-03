@@ -68,7 +68,12 @@ func part1(lines []string) int {
 		var start, end int
 		gotNumber := false
 		for j := range lines[i] {
-			if lines[i][j] == '.' {
+			if isDigit(lines[i][j]) {
+				if !gotNumber {
+					start = j
+					gotNumber = true
+				}
+			} else {
 				if !gotNumber {
 					continue
 				}
@@ -86,12 +91,6 @@ func part1(lines []string) int {
 				}
 			}
 
-			if isDigit(lines[i][j]) {
-				if !gotNumber {
-					start = j
-					gotNumber = true
-				}
-			}
 		}
 	}
 
