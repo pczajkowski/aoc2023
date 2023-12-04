@@ -13,6 +13,7 @@ type Card struct {
 	winning []int
 	owned   []int
 	wins    int
+	count   int
 }
 
 func readNumbers(part string) []int {
@@ -49,7 +50,7 @@ func readInput(file *os.File) []Card {
 			break
 		}
 
-		var current Card
+		current := Card{count: 1}
 		n, err := fmt.Sscanf(line, "Card %d:", &current.id)
 		if n != 1 || err != nil {
 			log.Fatalf("Failed to read card id: %s\n%s", line, err)
@@ -113,26 +114,13 @@ func part1(cards []Card) int {
 }
 
 func part2(cards []Card) int {
-	var pool []int
-	for i := range cards {
-		if cards[i].wins > 0 {
-			pool = append(pool, i)
-		}
-	}
-
 	var result int
-	for {
-		if len(pool) == 0 {
-			break
-		}
-
-		current := pool[0]
-		pool = pool[:1]
-		result++
-
-		for i := 0; i < cards[current].wins; i++ {
-			current++
-			pool = append(pool, current)
+	for i := range cards {
+		result += cards[i].count
+		if cards[i].wins > 0 {
+			for j := i + 1; j <= i+cards[i].wins; j++ {
+				cards[j].count += cards[i].count
+			}
 		}
 	}
 
