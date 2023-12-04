@@ -72,6 +72,43 @@ func readInput(file *os.File) []Card {
 	return cards
 }
 
+func isInArray(number int, array []int) bool {
+	for i := range array {
+		if array[i] == number {
+			return true
+		}
+	}
+
+	return false
+}
+
+func pow(x int) int {
+	result := 1
+	for i := 0; i < x; i++ {
+		result *= 2
+	}
+
+	return result
+}
+
+func part1(cards []Card) int {
+	var result int
+	for i := range cards {
+		var count int
+		for j := range cards[i].owned {
+			if isInArray(cards[i].owned[j], cards[i].winning) {
+				count++
+			}
+		}
+
+		if count > 0 {
+			result += pow(count - 1)
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -85,5 +122,5 @@ func main() {
 	}
 
 	cards := readInput(file)
-	fmt.Println(cards)
+	fmt.Println("Part1:", part1(cards))
 }
