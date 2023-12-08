@@ -119,9 +119,11 @@ func part1(hands []Hand) int {
 	sort.Slice(hands, func(i, j int) bool {
 		if hands[i].score == hands[j].score {
 			for k := 0; k < NumberOfCards; k++ {
-				if hands[i].ranks[k] < hands[j].ranks[k] {
-					return true
+				if hands[i].ranks[k] == hands[j].ranks[k] {
+					continue
 				}
+
+				return hands[i].ranks[k] < hands[j].ranks[k]
 			}
 		}
 
@@ -132,7 +134,6 @@ func part1(hands []Hand) int {
 		result += (i + 1) * hands[i].bid
 	}
 
-	fmt.Println(hands)
 	return result
 }
 
@@ -149,5 +150,5 @@ func main() {
 	}
 
 	hands := readInput(file)
-	fmt.Println(part1(hands))
+	fmt.Println("Part1:", part1(hands))
 }
