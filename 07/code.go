@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 )
 
 const (
@@ -113,6 +114,31 @@ const (
 	FiveKind
 )
 
+func part1(hands []Hand) int {
+	var result int
+	sort.Slice(hands, func(i, j int) bool {
+		if hands[i].score < hands[j].score {
+			return true
+		}
+
+		if hands[i].score == hands[j].score {
+			for k := 0; k < NumberOfCards; k++ {
+				if hands[i].ranks[k] < hands[j].ranks[k] {
+					return true
+				}
+			}
+		}
+
+		return false
+	})
+
+	for i := range hands {
+		result += (i + 1) * hands[i].bid
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -126,5 +152,5 @@ func main() {
 	}
 
 	hands := readInput(file)
-	fmt.Println(hands)
+	fmt.Println(part1(hands))
 }
