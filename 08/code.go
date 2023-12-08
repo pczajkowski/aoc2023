@@ -64,33 +64,9 @@ func readInput(file *os.File) Network {
 	return network
 }
 
-func part1(network Network) int {
-	steps := 0
-	current := "AAA"
-	mod := len(network.moves)
-	index := 0
-	for {
-		if current == "ZZZ" {
-			break
-		}
-
-		d := network.paths[current]
-		if network.moves[index] == 'L' {
-			current = d.left
-		} else {
-			current = d.right
-		}
-
-		index = (index + 1) % mod
-		steps++
-	}
-
-	return steps
-}
-
-func (n *Network) AtGoal() bool {
-	for i := range n.starts {
-		if !strings.HasSuffix(n.starts[i], "Z") {
+func atGoal(starts []string, goal string) bool {
+	for i := range starts {
+		if !strings.HasSuffix(starts[i], goal) {
 			return false
 		}
 	}
@@ -98,21 +74,21 @@ func (n *Network) AtGoal() bool {
 	return true
 }
 
-func part2(network Network) int {
+func part(network Network, starts []string, goal string) int {
 	steps := 0
 	mod := len(network.moves)
 	index := 0
 	for {
-		if network.AtGoal() {
+		if atGoal(starts, goal) {
 			break
 		}
 
-		for i := range network.starts {
-			d := network.paths[network.starts[i]]
+		for i := range starts {
+			d := network.paths[starts[i]]
 			if network.moves[index] == 'L' {
-				network.starts[i] = d.left
+				starts[i] = d.left
 			} else {
-				network.starts[i] = d.right
+				starts[i] = d.right
 			}
 
 		}
@@ -137,6 +113,6 @@ func main() {
 	}
 
 	network := readInput(file)
-	fmt.Println("Part1:", part1(network))
-	fmt.Println("Part2:", part2(network))
+	fmt.Println("Part1:", part(network, []string{"AAA"}, "ZZZ"))
+	fmt.Println("Part2:", part(network, network.starts, "Z"))
 }
