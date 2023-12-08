@@ -68,48 +68,44 @@ func atGoal(starts string, goal string) bool {
 	return strings.HasSuffix(starts, goal)
 }
 
-func min(results []int) int {
-	m := results[0]
-	for i := range results {
-		if results[i] < m {
-			m = results[i]
-		}
+func max(a, b int) int {
+	if a > b {
+		return a
 	}
 
-	return m
+	return b
 }
 
-func check(number int, numbers []int) bool {
-	for i := range numbers {
-		if number%numbers[i] != 0 {
-			return false
-		}
+func min(a, b int) int {
+	if a < b {
+		return a
 	}
 
-	return true
+	return b
 }
 
-func calculateResult(results []int) int {
-	if len(results) == 1 {
-		return results[0]
+func gcd(a, b int) int {
+	if a == 0 {
+		return b
 	}
 
-	min := min(results)
-	current := min
-	for {
-		if check(current, results) {
-			break
-		}
-
-		current += min
+	if b == 0 {
+		return a
 	}
 
-	return current
+	l := min(a, b)
+	h := max(a, b)
+
+	return gcd(l, h%l)
+}
+
+func lcm(a, b int) int {
+	return (a * b) / gcd(a, b)
 }
 
 func part(network Network, starts []string, goal string) int {
 	mod := len(network.moves)
-	var results []int
+	result := 1
 	for i := range starts {
 		steps := 0
 		index := 0
@@ -131,10 +127,10 @@ func part(network Network, starts []string, goal string) int {
 			index = (index + 1) % mod
 		}
 
-		results = append(results, steps)
+		result = lcm(result, steps)
 	}
 
-	return calculateResult(results)
+	return result
 }
 
 func main() {
