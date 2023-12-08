@@ -64,27 +64,23 @@ func readInput(file *os.File) Network {
 	return network
 }
 
-func atGoal(starts []string, goal string) bool {
-	for i := range starts {
-		if !strings.HasSuffix(starts[i], goal) {
-			return false
-		}
-	}
-
-	return true
+func atGoal(starts string, goal string) bool {
+	return strings.HasSuffix(starts, goal)
 }
 
 func part(network Network, starts []string, goal string) int {
-	steps := 0
 	mod := len(network.moves)
-	index := 0
-	for {
-		if atGoal(starts, goal) {
-			break
-		}
+	result := 1
+	for i := range starts {
+		steps := 0
+		index := 0
+		for {
+			if atGoal(starts[i], goal) {
+				break
+			}
 
-		turn := network.moves[index]
-		for i := range starts {
+			turn := network.moves[index]
+
 			d := network.paths[starts[i]]
 			if turn == 'L' {
 				starts[i] = d.left
@@ -92,13 +88,14 @@ func part(network Network, starts []string, goal string) int {
 				starts[i] = d.right
 			}
 
+			steps++
+			index = (index + 1) % mod
 		}
 
-		steps++
-		index = (index + 1) % mod
+		result *= steps
 	}
 
-	return steps
+	return result
 }
 
 func main() {
