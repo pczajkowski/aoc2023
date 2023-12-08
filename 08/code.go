@@ -50,13 +50,37 @@ func readInput(file *os.File) Network {
 			}
 
 			var directions Directions
-			directions.left = parts[0]
-			directions.right = parts[1]
+			directions.left = strings.TrimLeft(parts[0], "(")
+			directions.right = strings.TrimRight(parts[1], ")")
 			network.paths[from] = directions
 		}
 	}
 
 	return network
+}
+
+func part1(network Network) int {
+	steps := 0
+	current := "AAA"
+	mod := len(network.moves)
+	index := 0
+	for {
+		if current == "ZZZ" {
+			break
+		}
+
+		d := network.paths[current]
+		if network.moves[index] == 'L' {
+			current = d.left
+		} else {
+			current = d.right
+		}
+
+		index = (index + 1) % mod
+		steps++
+	}
+
+	return steps
 }
 
 func main() {
@@ -72,5 +96,5 @@ func main() {
 	}
 
 	network := readInput(file)
-	fmt.Println(network)
+	fmt.Println("Part1:", part1(network))
 }
