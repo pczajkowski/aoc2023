@@ -83,9 +83,10 @@ func part(network Network, starts []string, goal string) int {
 			break
 		}
 
+		turn := network.moves[index]
 		for i := range starts {
 			d := network.paths[starts[i]]
-			if network.moves[index] == 'L' {
+			if turn == 'L' {
 				starts[i] = d.left
 			} else {
 				starts[i] = d.right
