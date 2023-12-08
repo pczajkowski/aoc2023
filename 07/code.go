@@ -117,10 +117,6 @@ const (
 func part1(hands []Hand) int {
 	var result int
 	sort.Slice(hands, func(i, j int) bool {
-		if hands[i].score < hands[j].score {
-			return true
-		}
-
 		if hands[i].score == hands[j].score {
 			for k := 0; k < NumberOfCards; k++ {
 				if hands[i].ranks[k] < hands[j].ranks[k] {
@@ -129,13 +125,14 @@ func part1(hands []Hand) int {
 			}
 		}
 
-		return false
+		return hands[i].score < hands[j].score
 	})
 
 	for i := range hands {
 		result += (i + 1) * hands[i].bid
 	}
 
+	fmt.Println(hands)
 	return result
 }
 
