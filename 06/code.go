@@ -56,6 +56,25 @@ func readInput(file *os.File) [][]int {
 	return matrix
 }
 
+func part1(matrix [][]int) int {
+	result := 1
+
+	for i := range matrix[0] {
+		min := matrix[1][i] / matrix[0][i]
+		for {
+			if min*(matrix[0][i]-min) > matrix[1][i] {
+				break
+			}
+
+			min++
+		}
+
+		result *= matrix[0][i] - min - min + 1
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -69,5 +88,5 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println(matrix)
+	fmt.Println(part1(matrix))
 }
