@@ -40,6 +40,56 @@ func readInput(file *os.File) [][]int {
 	return matrix
 }
 
+func allZeros(numbers []int) bool {
+	for i := range numbers {
+		if numbers[i] != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func getNext(numbers []int) int {
+	var matrix [][]int
+	matrix = append(matrix, numbers)
+	level := 0
+	for {
+		if level >= len(matrix) {
+			break
+		}
+
+		var newLevel []int
+		for i := 1; i < len(matrix[level]); i++ {
+			newLevel = append(newLevel, matrix[level][i]-matrix[level][i-1])
+		}
+
+		matrix = append(matrix, newLevel)
+		if allZeros(newLevel) {
+			break
+		}
+
+		level++
+	}
+
+	for i := len(matrix) - 1; i > 0; i-- {
+		matrix[i-1] = append(matrix[i-1], matrix[i][len(matrix[i])-1]+matrix[i-1][len(matrix[i-1])-1])
+	}
+
+	return matrix[0][len(matrix[0])-1]
+}
+
+func part1(matrix [][]int) int {
+	var result int
+	for i := range matrix {
+		next := getNext(matrix[i])
+		matrix[i] = append(matrix[i], next)
+		result += next
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -53,5 +103,5 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println(matrix)
+	fmt.Println("Part1:", part1(matrix))
 }
