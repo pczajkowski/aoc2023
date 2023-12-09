@@ -50,7 +50,7 @@ func allZeros(numbers []int) bool {
 	return true
 }
 
-func getNext(numbers []int) int {
+func buildNewMatrix(numbers []int) [][]int {
 	var matrix [][]int
 	matrix = append(matrix, numbers)
 	level := 0
@@ -72,22 +72,32 @@ func getNext(numbers []int) int {
 		level++
 	}
 
-	for i := len(matrix) - 1; i > 0; i-- {
+	return matrix
+}
+
+func getNextAndPrevious(numbers []int) (int, int) {
+	matrix := buildNewMatrix(numbers)
+	bottom := len(matrix) - 1
+	for i := bottom; i > 0; i-- {
 		matrix[i-1] = append(matrix[i-1], matrix[i][len(matrix[i])-1]+matrix[i-1][len(matrix[i-1])-1])
 	}
 
-	return matrix[0][len(matrix[0])-1]
-}
-
-func part1(matrix [][]int) int {
-	var result int
-	for i := range matrix {
-		next := getNext(matrix[i])
-		matrix[i] = append(matrix[i], next)
-		result += next
+	for i := bottom; i > 0; i-- {
+		matrix[i-1] = append([]int{matrix[i-1][0] - matrix[i][0]}, matrix[i-1]...)
 	}
 
-	return result
+	return matrix[0][len(matrix[0])-1], matrix[0][0]
+}
+
+func parts(matrix [][]int) (int, int) {
+	var part1, part2 int
+	for i := range matrix {
+		next, previous := getNextAndPrevious(matrix[i])
+		part1 += next
+		part2 += previous
+	}
+
+	return part1, part2
 }
 
 func main() {
@@ -103,5 +113,7 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println("Part1:", part1(matrix))
+	part1, part2 := parts(matrix)
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }
