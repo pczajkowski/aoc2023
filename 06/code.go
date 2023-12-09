@@ -11,9 +11,14 @@ import (
 const Time = "Time:      "
 const Distance = "Distance:  "
 
-func readInput(file *os.File) [][]int {
+type Paper struct {
+	matrix    [][]int
+	bigMatrix [][]int
+}
+
+func readInput(file *os.File) Paper {
 	scanner := bufio.NewScanner(file)
-	var matrix [][]int
+	var paper Paper
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -33,10 +38,13 @@ func readInput(file *os.File) [][]int {
 		}
 
 		var numbers []int
+		var numberString string
 		for i := range parts {
 			if parts[i] == "" {
 				continue
 			}
+
+			numberString += parts[i]
 
 			var number int
 			n, err := fmt.Sscanf(parts[i], "%d", &number)
@@ -47,13 +55,21 @@ func readInput(file *os.File) [][]int {
 			numbers = append(numbers, number)
 		}
 
-		matrix = append(matrix, numbers)
-		if len(matrix) == 2 {
+		var bigNumber int
+		n, err := fmt.Sscanf(numberString, "%d", &bigNumber)
+		if n != 1 || err != nil {
+			log.Fatalf("Failed to read number: %s\n%s", numberString, err)
+		}
+
+		paper.bigMatrix = append(paper.bigMatrix, []int{bigNumber})
+
+		paper.matrix = append(paper.matrix, numbers)
+		if len(paper.matrix) == 2 {
 			break
 		}
 	}
 
-	return matrix
+	return paper
 }
 
 func part1(matrix [][]int) int {
@@ -87,6 +103,7 @@ func main() {
 
 	}
 
-	matrix := readInput(file)
-	fmt.Println(part1(matrix))
+	paper := readInput(file)
+	fmt.Println("Part1:", part1(paper.matrix))
+	fmt.Println("Part2:", part1(paper.bigMatrix))
 }
