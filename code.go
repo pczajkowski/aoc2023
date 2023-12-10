@@ -1,10 +1,36 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
 )
+
+type Point struct {
+	y, x int
+}
+
+func (p *Point) move(maze []string) bool {
+	switch maze[p.y][p.x] {
+	}
+}
+
+func readInput(file *os.File) []string {
+	scanner := bufio.NewScanner(file)
+	var maze []string
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			break
+		}
+
+		maze = append(maze, line)
+	}
+
+	return maze
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -12,11 +38,12 @@ func main() {
 	}
 
 	filePath := os.Args[1]
-	data, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to open %s!\n", filePath)
+
 	}
 
-	maze := string(data)
+	maze := readInput(file)
 	fmt.Println(maze)
 }
