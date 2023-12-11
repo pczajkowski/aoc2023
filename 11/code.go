@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strings"
 )
@@ -49,9 +48,8 @@ func readInput(file *os.File) Universe {
 	return universe
 }
 
-func distances(universe Universe, expanse float64) int {
+func distances(universe Universe, multiple int) int {
 	var result int
-	multiple := int(math.Pow(2, expanse))
 	edge := len(universe.galaxies)
 	for i := range universe.galaxies {
 		for j := i + 1; j < edge; j++ {
@@ -100,5 +98,6 @@ func main() {
 	}
 
 	universe := readInput(file)
-	fmt.Println("Part1:", distances(universe, 1))
+	fmt.Println("Part1:", distances(universe, 2))
+	fmt.Println("Part2:", distances(universe, 1000000))
 }
