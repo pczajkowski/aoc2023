@@ -64,8 +64,16 @@ func distances(universe Universe, expanse float64) int {
 				}
 			}
 
-			for x := universe.galaxies[i].x + 1; x <= universe.galaxies[j].x; x++ {
-				if universe.occupiedColumns[x] {
+			start := universe.galaxies[i].x + 1
+			end := universe.galaxies[j].x
+			if start > end {
+				start, end = end, start
+				start++
+				end--
+			}
+
+			for ; start <= end; start++ {
+				if universe.occupiedColumns[start] {
 					distance++
 				} else {
 					distance += multiple
@@ -92,5 +100,5 @@ func main() {
 	}
 
 	universe := readInput(file)
-	fmt.Println("Part1:", distances(universe, 2))
+	fmt.Println("Part1:", distances(universe, 1))
 }
