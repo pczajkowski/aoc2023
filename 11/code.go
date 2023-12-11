@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strings"
 )
@@ -48,6 +49,36 @@ func readInput(file *os.File) Universe {
 	return universe
 }
 
+func distances(universe Universe, expanse float64) int {
+	var result int
+	multiple := int(math.Pow(2, expanse))
+	edge := len(universe.galaxies)
+	for i := range universe.galaxies {
+		for j := i + 1; j < edge; j++ {
+			distance := 0
+			for y := universe.galaxies[i].y + 1; y <= universe.galaxies[j].y; y++ {
+				if universe.occupiedRows[y] {
+					distance++
+				} else {
+					distance += multiple
+				}
+			}
+
+			for x := universe.galaxies[i].x + 1; x <= universe.galaxies[j].x; x++ {
+				if universe.occupiedColumns[x] {
+					distance++
+				} else {
+					distance += multiple
+				}
+			}
+
+			result += distance
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -61,5 +92,5 @@ func main() {
 	}
 
 	universe := readInput(file)
-	fmt.Println(universe)
+	fmt.Println("Part1:", distances(universe, 2))
 }
