@@ -101,41 +101,7 @@ func checkHorizontal(index int, note [][]byte, height int, width int, canMissOne
 	return true
 }
 
-func part1(patterns []Pattern) int {
-	var result int
-	for i := range patterns {
-		width := len(patterns[i].note[0])
-		height := len(patterns[i].note)
-
-		vertical := 0
-		for index := 1; index < width; index++ {
-			if checkVertical(index, patterns[i].note, width, false) {
-				patterns[i].vertical = index
-				vertical = index
-				break
-			}
-		}
-
-		horizontal := 0
-		for index := 1; index < height; index++ {
-			if checkHorizontal(index, patterns[i].note, height, width, false) {
-				patterns[i].horizontal = index
-				horizontal = index
-				break
-			}
-		}
-
-		if horizontal > 0 {
-			result += horizontal * 100
-		} else if vertical > 0 {
-			result += vertical
-		}
-	}
-
-	return result
-}
-
-func part2(patterns []Pattern) int {
+func parts(patterns []Pattern, canMissOne bool) int {
 	var result int
 	for i := range patterns {
 		width := len(patterns[i].note[0])
@@ -147,20 +113,22 @@ func part2(patterns []Pattern) int {
 				continue
 			}
 
-			if checkVertical(index, patterns[i].note, width, true) {
+			if checkVertical(index, patterns[i].note, width, canMissOne) {
 				vertical = index
+				patterns[i].vertical = index
 				break
 			}
 		}
 
 		horizontal := 0
 		for index := 1; index < height; index++ {
-			if checkHorizontal(index, patterns[i].note, height, width, true) {
-				if index == patterns[i].horizontal {
-					continue
-				}
+			if index == patterns[i].horizontal {
+				continue
+			}
 
+			if checkHorizontal(index, patterns[i].note, height, width, canMissOne) {
 				horizontal = index
+				patterns[i].horizontal = index
 				break
 			}
 		}
@@ -188,6 +156,6 @@ func main() {
 	}
 
 	patterns := readInput(file)
-	fmt.Println("Part1:", part1(patterns))
-	fmt.Println("Part2:", part2(patterns))
+	fmt.Println("Part1:", parts(patterns, false))
+	fmt.Println("Part2:", parts(patterns, true))
 }
