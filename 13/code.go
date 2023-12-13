@@ -7,13 +7,10 @@ import (
 	"os"
 )
 
-type Point struct {
-	y, x int
-}
-
 type Pattern struct {
-	note   [][]byte
-	mirror Point
+	note       [][]byte
+	vertical   int
+	horizontal int
 }
 
 func readInput(file *os.File) []Pattern {
@@ -110,24 +107,28 @@ func part1(patterns []Pattern) int {
 		width := len(patterns[i].note[0])
 		height := len(patterns[i].note)
 
-		gotVertical := false
+		vertical := 0
 		for index := 1; index < width; index++ {
 			if checkVertical(index, patterns[i].note, width, false) {
-				result += index
-				gotVertical = true
+				patterns[i].vertical = index
+				vertical = index
 				break
 			}
 		}
 
-		if gotVertical {
-			continue
-		}
-
+		horizontal := 0
 		for index := 1; index < height; index++ {
 			if checkHorizontal(index, patterns[i].note, height, width, false) {
-				result += index * 100
+				patterns[i].horizontal = index
+				horizontal = index
 				break
 			}
+		}
+
+		if horizontal > 0 {
+			result += horizontal * 100
+		} else if vertical > 0 {
+			result += vertical
 		}
 	}
 
@@ -142,6 +143,10 @@ func part2(patterns []Pattern) int {
 
 		vertical := 0
 		for index := 1; index < width; index++ {
+			if index == patterns[i].vertical {
+				continue
+			}
+
 			if checkVertical(index, patterns[i].note, width, true) {
 				vertical = index
 				break
@@ -151,6 +156,10 @@ func part2(patterns []Pattern) int {
 		horizontal := 0
 		for index := 1; index < height; index++ {
 			if checkHorizontal(index, patterns[i].note, height, width, true) {
+				if index == patterns[i].horizontal {
+					continue
+				}
+
 				horizontal = index
 				break
 			}
