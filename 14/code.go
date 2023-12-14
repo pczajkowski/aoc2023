@@ -28,8 +28,7 @@ func readInput(file *os.File) [][]byte {
 	return platform
 }
 
-func tiltNorth(platform [][]byte, y int, x int, height int, width int) bool {
-	change := false
+func tiltNorth(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		prevY := y - 1
 		if prevY < 0 || platform[prevY][x] == '#' || platform[prevY][x] == 'O' {
@@ -38,32 +37,60 @@ func tiltNorth(platform [][]byte, y int, x int, height int, width int) bool {
 
 		platform[y][x] = '.'
 		platform[prevY][x] = 'O'
-		change = true
 		y--
 	}
-
-	return change
 }
 
-func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int) bool, height int, width int) bool {
-	change := false
+func tiltSouth(platform [][]byte, y int, x int, height int, width int) {
+	for {
+		nextY := y + 1
+		if nextY >= height || platform[nextY][x] == '#' || platform[nextY][x] == 'O' {
+			break
+		}
+
+		platform[y][x] = '.'
+		platform[nextY][x] = 'O'
+		y++
+	}
+}
+
+func tiltEast(platform [][]byte, y int, x int, height int, width int) {
+	for {
+		nextX := x + 1
+		if nextX >= width || platform[y][nextX] == '#' || platform[y][nextX] == 'O' {
+			break
+		}
+
+		platform[y][x] = '.'
+		platform[y][nextX] = 'O'
+		x++
+	}
+}
+
+func tiltWest(platform [][]byte, y int, x int, height int, width int) {
+	for {
+		nextX := x - 1
+		if nextX < 0 || platform[y][nextX] == '#' || platform[y][nextX] == 'O' {
+			break
+		}
+
+		platform[y][x] = '.'
+		platform[y][nextX] = 'O'
+		x--
+	}
+}
+
+func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
 	for y := range platform {
 		for x := range platform[y] {
 			if platform[y][x] == 'O' {
-				if direction(platform, y, x, height, width) {
-					change = true
-				}
+				direction(platform, y, x, height, width)
 			}
 		}
 	}
-
-	return change
 }
 
-func part1(platform [][]byte) int {
-	height := len(platform)
-	width := len(platform[0])
-	tiltPlatform(platform, tiltNorth, height, width)
+func calculate(platform [][]byte, height int) int {
 	var result int
 	for y := range platform {
 		for x := range platform[y] {
@@ -74,6 +101,14 @@ func part1(platform [][]byte) int {
 	}
 
 	return result
+}
+
+func part1(platform [][]byte) int {
+	height := len(platform)
+	width := len(platform[0])
+	tiltPlatform(platform, tiltNorth, height, width)
+
+	return calculate(platform, height)
 }
 
 func main() {
