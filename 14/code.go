@@ -90,6 +90,27 @@ func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int
 	}
 }
 
+func tiltPlatformFromBottom(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
+	y := height - 1
+	for ; y >= 0; y-- {
+		for x := range platform[y] {
+			if platform[y][x] == 'O' {
+				direction(platform, y, x, height, width)
+			}
+		}
+	}
+}
+
+func tiltPlatformFromRight(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
+	for y := range platform {
+		for x := width - 1; x >= 0; x-- {
+			if platform[y][x] == 'O' {
+				direction(platform, y, x, height, width)
+			}
+		}
+	}
+}
+
 func calculate(platform [][]byte, height int) int {
 	var result int
 	for y := range platform {
@@ -111,6 +132,37 @@ func part1(platform [][]byte) int {
 	return calculate(platform, height)
 }
 
+func copyPlatform(platform [][]byte) [][]byte {
+	var newPlatform [][]byte
+	for y := range platform {
+		newPlatform = append(newPlatform, platform[y])
+	}
+
+	return newPlatform
+}
+
+func printPlatform(platform [][]byte) {
+	for y := range platform {
+		fmt.Println(string(platform[y]))
+	}
+}
+
+func part2(platform [][]byte, cycles int) int {
+	height := len(platform)
+	width := len(platform[0])
+	var result int
+	for i := 0; i < cycles; i++ {
+		tiltPlatform(platform, tiltNorth, height, width)
+		tiltPlatform(platform, tiltWest, height, width)
+		tiltPlatformFromBottom(platform, tiltSouth, height, width)
+		tiltPlatformFromRight(platform, tiltEast, height, width)
+		fmt.Println(i + 1)
+		printPlatform(platform)
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -124,5 +176,7 @@ func main() {
 	}
 
 	platform := readInput(file)
+	platformCopy := copyPlatform(platform)
 	fmt.Println("Part1:", part1(platform))
+	fmt.Println("Part2:", part2(platformCopy, 4))
 }
