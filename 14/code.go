@@ -28,37 +28,46 @@ func readInput(file *os.File) [][]byte {
 	return platform
 }
 
-func tiltNorth(platform [][]byte) [][]byte {
-	newPlatform := [][]byte{platform[0]}
-	height := len(platform)
-	for i := 1; i < height; i++ {
-		newPlatform = append(newPlatform, platform[i])
-		for x := range newPlatform[i] {
-			if newPlatform[i][x] == 'O' {
-				y := i - 1
-				for {
-					if y < 0 || newPlatform[y][x] == '#' || newPlatform[y][x] == 'O' {
-						break
-					}
+func tiltNorth(platform [][]byte, y int, x int, height int, width int) bool {
+	change := false
+	for {
+		prevY := y - 1
+		if prevY < 0 || platform[prevY][x] == '#' || platform[prevY][x] == 'O' {
+			break
+		}
 
-					newPlatform[y+1][x] = '.'
-					newPlatform[y][x] = 'O'
-					y--
+		platform[y][x] = '.'
+		platform[prevY][x] = 'O'
+		change = true
+		y--
+	}
+
+	return change
+}
+
+func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int) bool, height int, width int) bool {
+	change := false
+	for y := range platform {
+		for x := range platform[y] {
+			if platform[y][x] == 'O' {
+				if direction(platform, y, x, height, width) {
+					change = true
 				}
 			}
 		}
 	}
 
-	return newPlatform
+	return change
 }
 
 func part1(platform [][]byte) int {
-	newPlatform := tiltNorth(platform)
-	height := len(newPlatform)
+	height := len(platform)
+	width := len(platform[0])
+	tiltPlatform(platform, tiltNorth, height, width)
 	var result int
-	for y := range newPlatform {
-		for x := range newPlatform[y] {
-			if newPlatform[y][x] == 'O' {
+	for y := range platform {
+		for x := range platform[y] {
+			if platform[y][x] == 'O' {
 				result += height - y
 			}
 		}
