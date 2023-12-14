@@ -28,6 +28,11 @@ func readInput(file *os.File) [][]byte {
 	return platform
 }
 
+func moveO(a *byte, b *byte) {
+	*a = '.'
+	*b = 'O'
+}
+
 func tiltNorth(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		prevY := y - 1
@@ -35,8 +40,7 @@ func tiltNorth(platform [][]byte, y int, x int, height int, width int) {
 			break
 		}
 
-		platform[y][x] = '.'
-		platform[prevY][x] = 'O'
+		moveO(&platform[y][x], &platform[prevY][x])
 		y--
 	}
 }
@@ -48,8 +52,7 @@ func tiltSouth(platform [][]byte, y int, x int, height int, width int) {
 			break
 		}
 
-		platform[y][x] = '.'
-		platform[nextY][x] = 'O'
+		moveO(&platform[y][x], &platform[nextY][x])
 		y++
 	}
 }
@@ -61,8 +64,7 @@ func tiltEast(platform [][]byte, y int, x int, height int, width int) {
 			break
 		}
 
-		platform[y][x] = '.'
-		platform[y][nextX] = 'O'
+		moveO(&platform[y][x], &platform[y][nextX])
 		x++
 	}
 }
@@ -74,8 +76,7 @@ func tiltWest(platform [][]byte, y int, x int, height int, width int) {
 			break
 		}
 
-		platform[y][x] = '.'
-		platform[y][nextX] = 'O'
+		moveO(&platform[y][x], &platform[y][nextX])
 		x--
 	}
 }
