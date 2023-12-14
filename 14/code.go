@@ -52,6 +52,21 @@ func tiltNorth(platform [][]byte) [][]byte {
 	return newPlatform
 }
 
+func part1(platform [][]byte) int {
+	newPlatform := tiltNorth(platform)
+	height := len(newPlatform)
+	var result int
+	for y := range newPlatform {
+		for x := range newPlatform[y] {
+			if newPlatform[y][x] == 'O' {
+				result += height - y
+			}
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -65,5 +80,5 @@ func main() {
 	}
 
 	platform := readInput(file)
-	fmt.Println(tiltNorth(platform))
+	fmt.Println(part1(platform))
 }
