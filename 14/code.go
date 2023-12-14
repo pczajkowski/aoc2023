@@ -28,15 +28,21 @@ func readInput(file *os.File) [][]byte {
 	return platform
 }
 
+const (
+	Round = 'O'
+	Cube  = '#'
+	Empty = '.'
+)
+
 func moveO(a *byte, b *byte) {
-	*a = '.'
-	*b = 'O'
+	*a = Empty
+	*b = Round
 }
 
 func tiltNorth(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		prevY := y - 1
-		if prevY < 0 || platform[prevY][x] == '#' || platform[prevY][x] == 'O' {
+		if prevY < 0 || platform[prevY][x] == Cube || platform[prevY][x] == Round {
 			break
 		}
 
@@ -48,7 +54,7 @@ func tiltNorth(platform [][]byte, y int, x int, height int, width int) {
 func tiltSouth(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		nextY := y + 1
-		if nextY >= height || platform[nextY][x] == '#' || platform[nextY][x] == 'O' {
+		if nextY >= height || platform[nextY][x] == Cube || platform[nextY][x] == Round {
 			break
 		}
 
@@ -60,7 +66,7 @@ func tiltSouth(platform [][]byte, y int, x int, height int, width int) {
 func tiltEast(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		nextX := x + 1
-		if nextX >= width || platform[y][nextX] == '#' || platform[y][nextX] == 'O' {
+		if nextX >= width || platform[y][nextX] == Cube || platform[y][nextX] == Round {
 			break
 		}
 
@@ -72,7 +78,7 @@ func tiltEast(platform [][]byte, y int, x int, height int, width int) {
 func tiltWest(platform [][]byte, y int, x int, height int, width int) {
 	for {
 		nextX := x - 1
-		if nextX < 0 || platform[y][nextX] == '#' || platform[y][nextX] == 'O' {
+		if nextX < 0 || platform[y][nextX] == Cube || platform[y][nextX] == Round {
 			break
 		}
 
@@ -84,7 +90,7 @@ func tiltWest(platform [][]byte, y int, x int, height int, width int) {
 func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
 	for y := range platform {
 		for x := range platform[y] {
-			if platform[y][x] == 'O' {
+			if platform[y][x] == Round {
 				direction(platform, y, x, height, width)
 			}
 		}
@@ -94,7 +100,7 @@ func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int
 func tiltPlatformFromBottomRight(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
 	for y := height - 1; y >= 0; y-- {
 		for x := width - 1; x >= 0; x-- {
-			if platform[y][x] == 'O' {
+			if platform[y][x] == Round {
 				direction(platform, y, x, height, width)
 			}
 		}
@@ -105,7 +111,7 @@ func calculate(platform [][]byte, height int) int {
 	var result int
 	for y := range platform {
 		for x := range platform[y] {
-			if platform[y][x] == 'O' {
+			if platform[y][x] == Round {
 				result += height - y
 			}
 		}
