@@ -150,17 +150,14 @@ func printPlatform(platform [][]byte) {
 func part2(platform [][]byte, cycles int) int {
 	height := len(platform)
 	width := len(platform[0])
-	var result int
 	for i := 0; i < cycles; i++ {
 		tiltPlatform(platform, tiltNorth, height, width)
 		tiltPlatform(platform, tiltWest, height, width)
 		tiltPlatformFromBottom(platform, tiltSouth, height, width)
 		tiltPlatformFromRight(platform, tiltEast, height, width)
-		fmt.Println(i + 1)
-		printPlatform(platform)
 	}
 
-	return result
+	return calculate(platform, height)
 }
 
 func main() {
@@ -178,5 +175,5 @@ func main() {
 	platform := readInput(file)
 	platformCopy := copyPlatform(platform)
 	fmt.Println("Part1:", part1(platform))
-	fmt.Println("Part2:", part2(platformCopy, 4))
+	fmt.Println("Part2:", part2(platformCopy, 1000))
 }
