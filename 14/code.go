@@ -90,18 +90,8 @@ func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int
 	}
 }
 
-func tiltPlatformFromBottom(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
+func tiltPlatformFromBottomRight(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
 	for y := height - 1; y >= 0; y-- {
-		for x := range platform[y] {
-			if platform[y][x] == 'O' {
-				direction(platform, y, x, height, width)
-			}
-		}
-	}
-}
-
-func tiltPlatformFromRight(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
-	for y := range platform {
 		for x := width - 1; x >= 0; x-- {
 			if platform[y][x] == 'O' {
 				direction(platform, y, x, height, width)
@@ -146,8 +136,8 @@ func part2(platform [][]byte, cycles int) int {
 	for i := 0; i < cycles; i++ {
 		tiltPlatform(platform, tiltNorth, height, width)
 		tiltPlatform(platform, tiltWest, height, width)
-		tiltPlatformFromBottom(platform, tiltSouth, height, width)
-		tiltPlatformFromRight(platform, tiltEast, height, width)
+		tiltPlatformFromBottomRight(platform, tiltSouth, height, width)
+		tiltPlatformFromBottomRight(platform, tiltEast, height, width)
 	}
 
 	return calculate(platform, height)
