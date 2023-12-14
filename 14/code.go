@@ -80,5 +80,5 @@ func main() {
 	}
 
 	platform := readInput(file)
-	fmt.Println(part1(platform))
+	fmt.Println("Part1:", part1(platform))
 }
