@@ -91,8 +91,7 @@ func tiltPlatform(platform [][]byte, direction func([][]byte, int, int, int, int
 }
 
 func tiltPlatformFromBottom(platform [][]byte, direction func([][]byte, int, int, int, int), height int, width int) {
-	y := height - 1
-	for ; y >= 0; y-- {
+	for y := height - 1; y >= 0; y-- {
 		for x := range platform[y] {
 			if platform[y][x] == 'O' {
 				direction(platform, y, x, height, width)
@@ -139,12 +138,6 @@ func copyPlatform(platform [][]byte) [][]byte {
 	}
 
 	return newPlatform
-}
-
-func printPlatform(platform [][]byte) {
-	for y := range platform {
-		fmt.Println(string(platform[y]))
-	}
 }
 
 func part2(platform [][]byte, cycles int) int {
