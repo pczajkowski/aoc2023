@@ -25,11 +25,30 @@ func readInput(path string) []string {
 	return parts
 }
 
+func hash(text string) int {
+	var current int
+	for i := range text {
+		current += int(text[i])
+		current = current * 17 % 256
+	}
+
+	return current
+}
+
+func part1(steps []string) int {
+	var result int
+	for i := range steps {
+		result += hash(steps[i])
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
 	}
 
 	steps := readInput(os.Args[1])
-	fmt.Println(steps)
+	fmt.Println("Part1:", part1(steps))
 }
