@@ -54,26 +54,56 @@ type Lens struct {
 	power int
 }
 
+func lensFromString(text string) Lens {
+	parts := strings.Split(text, "=")
+	if len(parts) != 2 {
+		log.Fatalf("Problem reading step %s", text)
+	}
+
+	lens := Lens{label: parts[0]}
+	n, err := strconv.Atoi(parts[1])
+	if err != nil {
+		log.Fatalf("Problem converting number %s: %s", parts[1], err)
+	}
+
+	lens.power = n
+
+	return lens
+}
+
+func addLens(box []Lens, lens Lens) []Lens {
+	found := false
+	for i := range box {
+		if box[i].label == lens.label {
+			box[i] = lens
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		box = append(box, lens)
+	}
+
+	return box
+}
+
 func getBoxes(steps []string) [][]Lens {
 	lenses := make([][]Lens, 256)
 	for i := range steps {
 		if strings.Contains(steps[i], "=") {
-			parts := strings.Split(steps[i], "=")
-			if len(parts) != 2 {
-				log.Fatalf("Problem reading step %s", steps[i])
-			}
-
-			lens := Lens{label: parts[0]}
-			n, err := strconv.Atoi(parts[1])
-			if err != nil {
-				log.Fatalf("Problem converting number %s: %s", parts[1], err)
-			}
-
-			lens.power = n
-			fmt.Println(lens)
+			lens := lensFromString(steps[i])
+			boxIndex := hash(lens.label)
+			lenses[boxIndex] = addLens(lenses[boxIndex], lens)
 		} else {
 			label := strings.TrimRight(steps[i], "-")
-			fmt.Println(label)
+			boxIndex := hash(label)
+			for i := range lenses[boxIndex] {
+				if lenses[boxIndex][i].label == label {
+					lenses[boxIndex] = append(lenses[boxIndex][:i], lenses[boxIndex][i+1:]...)
+					break
+				}
+			}
 		}
 	}
 
@@ -82,7 +112,8 @@ func getBoxes(steps []string) [][]Lens {
 
 func part2(steps []string) int {
 	var result int
-	getBoxes(steps)
+	lenses := getBoxes(steps)
+	fmt.Println(lenses)
 	return result
 }
 
