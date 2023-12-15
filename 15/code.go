@@ -113,7 +113,12 @@ func getBoxes(steps []string) [][]Lens {
 func part2(steps []string) int {
 	var result int
 	lenses := getBoxes(steps)
-	fmt.Println(lenses)
+	for i := range lenses {
+		for j := range lenses[i] {
+			result += (i + 1) * (j + 1) * lenses[i][j].power
+		}
+	}
+
 	return result
 }
 
