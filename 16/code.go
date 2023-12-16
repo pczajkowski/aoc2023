@@ -55,11 +55,10 @@ type Beam struct {
 }
 
 func (b *Beam) directions(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
-	var beams []Beam
-
 	switch board[b.pos.y][b.pos.x] {
 	case Horizontal:
 		if b.pos.direction != East && b.pos.direction != West {
+			var beams []Beam
 			b.pos.direction = East
 			if !pastBeams[b.pos] {
 				pastBeams[b.pos] = true
@@ -75,6 +74,7 @@ func (b *Beam) directions(board [][]byte, height int, width int, pastBeams map[P
 		}
 	case Vertical:
 		if b.pos.direction != South && b.pos.direction != North {
+			var beams []Beam
 			b.pos.direction = South
 			if !pastBeams[b.pos] {
 				pastBeams[b.pos] = true
@@ -112,7 +112,7 @@ func (b *Beam) directions(board [][]byte, height int, width int, pastBeams map[P
 		}
 	}
 
-	return append(beams, *b)
+	return []Beam{*b}
 }
 
 func (b *Beam) move(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
