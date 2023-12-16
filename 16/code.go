@@ -54,11 +54,8 @@ type Beam struct {
 	wasHere map[Point]bool
 }
 
-func (b *Beam) canContinue(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
+func (b *Beam) directions(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
 	var beams []Beam
-	if b.wasHere[b.pos] || b.pos.x < 0 || b.pos.x >= width || b.pos.y < 0 || b.pos.y >= height {
-		return beams
-	}
 
 	switch board[b.pos.y][b.pos.x] {
 	case Horizontal:
@@ -121,18 +118,28 @@ func (b *Beam) canContinue(board [][]byte, height int, width int, pastBeams map[
 func (b *Beam) move(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
 	b.wasHere[b.pos] = true
 
-	switch b.pos.direction {
-	case North:
-		b.pos.y--
-	case South:
-		b.pos.y++
-	case East:
-		b.pos.x++
-	case West:
-		b.pos.x--
+	var beams []Beam
+	directions := b.directions(board, height, width, pastBeams)
+	for i := range directions {
+		switch directions[i].pos.direction {
+		case North:
+			directions[i].pos.y--
+		case South:
+			directions[i].pos.y++
+		case East:
+			directions[i].pos.x++
+		case West:
+			directions[i].pos.x--
+		}
+
+		if directions[i].wasHere[directions[i].pos] || directions[i].pos.x < 0 || directions[i].pos.x >= width || directions[i].pos.y < 0 || directions[i].pos.y >= height {
+			continue
+		}
+
+		beams = append(beams, directions[i])
 	}
 
-	return b.canContinue(board, height, width, pastBeams)
+	return beams
 }
 
 func emptyBoard(height int, width int) [][]byte {
