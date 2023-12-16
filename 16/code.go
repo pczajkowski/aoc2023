@@ -164,10 +164,10 @@ func count(board [][]byte) int {
 	return result
 }
 
-func processBeams(board [][]byte, height int, width int, beams []Beam) int {
+func processBeams(board [][]byte, height int, width int, beam Beam) int {
 	trackBoard := emptyBoard(height, width)
 	pastBeams := make(map[Point]bool)
-	pastBeams[beams[0].pos] = true
+	beams := []Beam{beam}
 
 	for {
 		if len(beams) == 0 {
@@ -176,6 +176,7 @@ func processBeams(board [][]byte, height int, width int, beams []Beam) int {
 
 		var newBeams []Beam
 		for i := range beams {
+			pastBeams[beams[i].pos] = true
 			if trackBoard[beams[i].pos.y][beams[i].pos.x] != Mark {
 				trackBoard[beams[i].pos.y][beams[i].pos.x] = Mark
 			}
@@ -192,9 +193,72 @@ func processBeams(board [][]byte, height int, width int, beams []Beam) int {
 func part1(board [][]byte) int {
 	height := len(board)
 	width := len(board[0])
-	beams := []Beam{Beam{pos: Point{y: 0, x: 0, direction: East}, wasHere: make(map[Point]bool)}}
 
-	return processBeams(board, height, width, beams)
+	return processBeams(board, height, width, Beam{pos: Point{y: 0, x: 0, direction: East}, wasHere: make(map[Point]bool)})
+}
+
+func part2(board [][]byte) int {
+	height := len(board)
+	bottomEdge := height - 1
+	width := len(board[0])
+	rightEdge := width - 1
+	max := 0
+
+	var beams []Beam
+	for x := 0; x < width; x++ {
+		beams = append(beams, Beam{pos: Point{y: 0, x: x, direction: South}, wasHere: make(map[Point]bool)})
+		if x == 0 {
+			beams = append(beams, Beam{pos: Point{y: 0, x: x, direction: East}, wasHere: make(map[Point]bool)})
+		}
+
+		if x == rightEdge {
+			beams = append(beams, Beam{pos: Point{y: 0, x: x, direction: West}, wasHere: make(map[Point]bool)})
+		}
+	}
+
+	for x := 0; x < width; x++ {
+		beams = append(beams, Beam{pos: Point{y: bottomEdge, x: x, direction: North}, wasHere: make(map[Point]bool)})
+		if x == 0 {
+			beams = append(beams, Beam{pos: Point{y: bottomEdge, x: x, direction: East}, wasHere: make(map[Point]bool)})
+		}
+
+		if x == rightEdge {
+			beams = append(beams, Beam{pos: Point{y: bottomEdge, x: x, direction: West}, wasHere: make(map[Point]bool)})
+		}
+	}
+
+	for y := 0; y < height; y++ {
+		beams = append(beams, Beam{pos: Point{y: y, x: 0, direction: East}, wasHere: make(map[Point]bool)})
+		if y == 0 {
+			beams = append(beams, Beam{pos: Point{y: y, x: 0, direction: South}, wasHere: make(map[Point]bool)})
+		}
+
+		if y == bottomEdge {
+			beams = append(beams, Beam{pos: Point{y: y, x: 0, direction: North}, wasHere: make(map[Point]bool)})
+		}
+
+	}
+
+	for y := 0; y < height; y++ {
+		beams = append(beams, Beam{pos: Point{y: y, x: rightEdge, direction: West}, wasHere: make(map[Point]bool)})
+		if y == 0 {
+			beams = append(beams, Beam{pos: Point{y: y, x: rightEdge, direction: South}, wasHere: make(map[Point]bool)})
+		}
+
+		if y == bottomEdge {
+			beams = append(beams, Beam{pos: Point{y: y, x: rightEdge, direction: North}, wasHere: make(map[Point]bool)})
+		}
+
+	}
+
+	for i := range beams {
+		energy := processBeams(board, height, width, beams[i])
+		if energy > max {
+			max = energy
+		}
+	}
+
+	return max
 }
 
 func main() {
@@ -211,4 +275,5 @@ func main() {
 
 	board := readInput(file)
 	fmt.Println("Part1:", part1(board))
+	fmt.Println("Part2:", part2(board))
 }
