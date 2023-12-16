@@ -44,76 +44,95 @@ const (
 	West
 )
 
-type Beam struct {
+type Point struct {
 	y, x      int
 	direction int
 }
 
-func (b *Beam) canContinue(board [][]byte, height int, width int) []Beam {
+type Beam struct {
+	pos     Point
+	wasHere map[Point]bool
+}
+
+func (b *Beam) canContinue(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
 	var beams []Beam
-	if b.x < 0 || b.x >= width || b.y < 0 || b.y >= height {
+	if b.wasHere[b.pos] || b.pos.x < 0 || b.pos.x >= width || b.pos.y < 0 || b.pos.y >= height {
 		return beams
 	}
 
-	switch board[b.y][b.x] {
+	switch board[b.pos.y][b.pos.x] {
 	case Horizontal:
-		if b.direction != East && b.direction != West {
-			b.direction = East
-			beams = append(beams, *b)
-			b.direction = West
-			beams = append(beams, *b)
+		if b.pos.direction != East && b.pos.direction != West {
+			b.pos.direction = East
+			if !pastBeams[b.pos] {
+				pastBeams[b.pos] = true
+				beams = append(beams, *b)
+			}
+			b.pos.direction = West
+			if !pastBeams[b.pos] {
+				pastBeams[b.pos] = true
+				beams = append(beams, *b)
+			}
 
 			return beams
 		}
 	case Vertical:
-		if b.direction != South && b.direction != North {
-			b.direction = South
-			beams = append(beams, *b)
-			b.direction = North
-			beams = append(beams, *b)
+		if b.pos.direction != South && b.pos.direction != North {
+			b.pos.direction = South
+			if !pastBeams[b.pos] {
+				pastBeams[b.pos] = true
+				beams = append(beams, *b)
+			}
+			b.pos.direction = North
+			if !pastBeams[b.pos] {
+				pastBeams[b.pos] = true
+				beams = append(beams, *b)
+			}
 
 			return beams
 		}
 	case Slash:
-		switch b.direction {
+		switch b.pos.direction {
 		case North:
-			b.direction = East
+			b.pos.direction = East
 		case South:
-			b.direction = West
+			b.pos.direction = West
 		case East:
-			b.direction = North
+			b.pos.direction = North
 		case West:
-			b.direction = South
+			b.pos.direction = South
 		}
 	case Backslash:
-		switch b.direction {
+		switch b.pos.direction {
 		case North:
-			b.direction = West
+			b.pos.direction = West
 		case South:
-			b.direction = East
+			b.pos.direction = East
 		case East:
-			b.direction = South
+			b.pos.direction = South
 		case West:
-			b.direction = North
+			b.pos.direction = North
 		}
 	}
 
 	return append(beams, *b)
 }
 
-func (b *Beam) move(board [][]byte, height int, width int) []Beam {
-	switch b.direction {
+func (b *Beam) move(board [][]byte, height int, width int, pastBeams map[Point]bool) []Beam {
+	b.wasHere[b.pos] = true
+
+	switch b.pos.direction {
 	case North:
-		b.y--
+		b.pos.y--
 	case South:
-		b.y++
+		b.pos.y++
 	case East:
-		b.x++
+		b.pos.x++
 	case West:
-		b.x--
+		b.pos.x--
 	}
 
-	return b.canContinue(board, height, width)
+	return b.canContinue(board, height, width, pastBeams)
 }
 
 func emptyBoard(height int, width int) [][]byte {
@@ -141,31 +160,29 @@ func count(board [][]byte) int {
 func part1(board [][]byte) int {
 	height := len(board)
 	width := len(board[0])
-	var result int
 	trackBoard := emptyBoard(height, width)
-	beams := []Beam{Beam{y: 0, x: 0, direction: East}}
+	beams := []Beam{Beam{pos: Point{y: 0, x: 0, direction: East}, wasHere: make(map[Point]bool)}}
+	pastBeams := make(map[Point]bool)
+	pastBeams[beams[0].pos] = true
 
 	for {
-		change := false
-		var newBeams []Beam
-		for i := range beams {
-			if trackBoard[beams[i].y][beams[i].x] != Mark {
-				trackBoard[beams[i].y][beams[i].x] = Mark
-				change = true
-			}
-
-			newBeams = append(newBeams, beams[i].move(board, height, width)...)
+		if len(beams) == 0 {
+			break
 		}
 
-		if !change {
-			break
+		var newBeams []Beam
+		for i := range beams {
+			if trackBoard[beams[i].pos.y][beams[i].pos.x] != Mark {
+				trackBoard[beams[i].pos.y][beams[i].pos.x] = Mark
+			}
+
+			newBeams = append(newBeams, beams[i].move(board, height, width, pastBeams)...)
 		}
 
 		beams = newBeams
 	}
 
-	fmt.Println(count(trackBoard), trackBoard)
-	return result
+	return count(trackBoard)
 }
 
 func main() {
@@ -181,5 +198,5 @@ func main() {
 	}
 
 	board := readInput(file)
-	fmt.Println(part1(board))
+	fmt.Println("Part1:", part1(board))
 }
