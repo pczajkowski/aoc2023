@@ -164,11 +164,8 @@ func count(board [][]byte) int {
 	return result
 }
 
-func part1(board [][]byte) int {
-	height := len(board)
-	width := len(board[0])
+func processBeams(board [][]byte, height int, width int, beams []Beam) int {
 	trackBoard := emptyBoard(height, width)
-	beams := []Beam{Beam{pos: Point{y: 0, x: 0, direction: East}, wasHere: make(map[Point]bool)}}
 	pastBeams := make(map[Point]bool)
 	pastBeams[beams[0].pos] = true
 
@@ -190,6 +187,14 @@ func part1(board [][]byte) int {
 	}
 
 	return count(trackBoard)
+}
+
+func part1(board [][]byte) int {
+	height := len(board)
+	width := len(board[0])
+	beams := []Beam{Beam{pos: Point{y: 0, x: 0, direction: East}, wasHere: make(map[Point]bool)}}
+
+	return processBeams(board, height, width, beams)
 }
 
 func main() {
