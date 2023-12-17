@@ -178,11 +178,11 @@ func getWest(board [][]int, height int, width int, lava Destination) []Destinati
 func getDirections(direction int) []int {
 	switch direction {
 	case North:
-		return []int{West, North, East}
+		return []int{East, North, West}
 	case East:
-		return []int{North, East, South}
+		return []int{East, South, North}
 	case South:
-		return []int{West, South, East}
+		return []int{East, South, West}
 	case West:
 		return []int{South, West, North}
 	}
