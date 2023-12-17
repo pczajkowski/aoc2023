@@ -216,7 +216,6 @@ func part1(board [][]int) int {
 	goal := Point{y: height - 1, x: width - 1}
 	explored := make(map[Point]int)
 	lava := Destination{pos: Point{x: 0, y: 0}, moves: 0, direction: East}
-	prev := lava
 	frontier := []Destination{lava}
 
 	for {
@@ -227,11 +226,6 @@ func part1(board [][]int) int {
 		current := frontier[0]
 		frontier = frontier[1:]
 
-		if current.direction == prev.direction && current.moves+prev.moves > MaxMoves {
-			continue
-		}
-
-		prev = current
 		if current.pos == goal {
 			if min > current.cost {
 				min = current.cost
@@ -250,7 +244,7 @@ func part1(board [][]int) int {
 		}
 
 		sort.Slice(frontier, func(i, j int) bool {
-			return frontier[i].cost < frontier[j].cost
+			return frontier[i].cost+frontier[i].moves < frontier[j].cost+frontier[j].moves
 		})
 
 	}
