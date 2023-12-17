@@ -58,10 +58,6 @@ func getNorth(board [][]int, height int, width int, lava Destination) []Destinat
 		moves = lava.moves
 	}
 
-	if moves > MaxMoves {
-		return destinations
-	}
-
 	end := lava.pos.y - MaxMoves
 	if end < 0 {
 		end = 0
@@ -86,10 +82,6 @@ func getEast(board [][]int, height int, width int, lava Destination) []Destinati
 	moves := 0
 	if lava.direction == East {
 		moves = lava.moves
-	}
-
-	if moves > MaxMoves {
-		return destinations
 	}
 
 	end := lava.pos.x + MaxMoves
@@ -121,10 +113,6 @@ func getSouth(board [][]int, height int, width int, lava Destination) []Destinat
 		moves = lava.moves
 	}
 
-	if moves > MaxMoves {
-		return destinations
-	}
-
 	end := lava.pos.y + MaxMoves
 	if end >= height {
 		end = height - 1
@@ -149,10 +137,6 @@ func getWest(board [][]int, height int, width int, lava Destination) []Destinati
 	moves := 0
 	if lava.direction == West {
 		moves = lava.moves
-	}
-
-	if moves > MaxMoves {
-		return destinations
 	}
 
 	end := lava.pos.x - MaxMoves
