@@ -194,7 +194,7 @@ func getDestinations(board [][]int, height int, width int, lava Destination) []D
 	var destinations []Destination
 	directions := getDirections(lava.direction)
 	for i := range directions {
-		switch i {
+		switch directions[i] {
 		case North:
 			destinations = append(destinations, getNorth(board, height, width, lava)...)
 		case East:
