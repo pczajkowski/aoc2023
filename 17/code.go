@@ -227,10 +227,9 @@ func calculate(board [][]int, minMoves int, maxMoves int) int {
 		successors := getDestinations(board, height, width, current, minMoves, maxMoves)
 		for i := range successors {
 			v := Visited{pos: successors[i].pos, direction: successors[i].direction}
-			newCost := successors[i].cost
 			value, ok := explored[v]
-			if !ok || value > newCost {
-				explored[v] = newCost
+			if !ok || value > successors[i].cost {
+				explored[v] = successors[i].cost
 				frontier = append(frontier, successors[i])
 			}
 		}
