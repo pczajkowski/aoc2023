@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 )
 
 const (
@@ -233,20 +232,14 @@ func part1(board [][]int) int {
 		}
 
 		successors := getDestinations(board, height, width, current)
-		fmt.Println(current, successors)
 		for i := range successors {
-			newCost := successors[i].cost + successors[i].moves
+			newCost := successors[i].cost
 			value, ok := explored[successors[i].pos]
 			if !ok || value > newCost {
 				explored[successors[i].pos] = newCost
 				frontier = append(frontier, successors[i])
 			}
 		}
-
-		sort.Slice(frontier, func(i, j int) bool {
-			return frontier[i].cost+frontier[i].moves < frontier[j].cost+frontier[j].moves
-		})
-
 	}
 
 	return min
