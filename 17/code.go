@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	Diff     = 48
-	MaxMoves = 3
+	Diff = 48
 )
 
 func readInput(file *os.File) [][]int {
@@ -51,14 +50,14 @@ type Destination struct {
 	direction int
 }
 
-func getNorth(board [][]int, height int, width int, lava Destination) []Destination {
+func getNorth(board [][]int, height int, width int, lava Destination, minMoves int, maxMoves int) []Destination {
 	var destinations []Destination
 	moves := 0
 	if lava.direction == North {
 		moves = lava.moves
 	}
 
-	end := lava.pos.y - MaxMoves
+	end := lava.pos.y - maxMoves
 	if end < 0 {
 		end = 0
 	}
@@ -67,24 +66,26 @@ func getNorth(board [][]int, height int, width int, lava Destination) []Destinat
 	for y := lava.pos.y - 1; y >= end; y-- {
 		cost += board[y][lava.pos.x]
 		moves++
-		if moves > MaxMoves {
+		if moves > maxMoves {
 			break
 		}
 
-		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: North})
+		if moves > minMoves {
+			destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: North})
+		}
 	}
 
 	return destinations
 }
 
-func getEast(board [][]int, height int, width int, lava Destination) []Destination {
+func getEast(board [][]int, height int, width int, lava Destination, minMoves int, maxMoves int) []Destination {
 	var destinations []Destination
 	moves := 0
 	if lava.direction == East {
 		moves = lava.moves
 	}
 
-	end := lava.pos.x + MaxMoves
+	end := lava.pos.x + maxMoves
 	if end >= width {
 		end = width - 1
 	}
@@ -93,27 +94,26 @@ func getEast(board [][]int, height int, width int, lava Destination) []Destinati
 	for x := lava.pos.x + 1; x <= end; x++ {
 		cost += board[lava.pos.y][x]
 		moves++
-		if moves > MaxMoves {
+		if moves > maxMoves {
 			break
 		}
 
-		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: East})
-		if moves > MaxMoves {
-			break
+		if moves > minMoves {
+			destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: East})
 		}
 	}
 
 	return destinations
 }
 
-func getSouth(board [][]int, height int, width int, lava Destination) []Destination {
+func getSouth(board [][]int, height int, width int, lava Destination, minMoves int, maxMoves int) []Destination {
 	var destinations []Destination
 	moves := 0
 	if lava.direction == South {
 		moves = lava.moves
 	}
 
-	end := lava.pos.y + MaxMoves
+	end := lava.pos.y + maxMoves
 	if end >= height {
 		end = height - 1
 	}
@@ -122,24 +122,26 @@ func getSouth(board [][]int, height int, width int, lava Destination) []Destinat
 	for y := lava.pos.y + 1; y <= end; y++ {
 		cost += board[y][lava.pos.x]
 		moves++
-		if moves > MaxMoves {
+		if moves > maxMoves {
 			break
 		}
 
-		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: South})
+		if moves > minMoves {
+			destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: South})
+		}
 	}
 
 	return destinations
 }
 
-func getWest(board [][]int, height int, width int, lava Destination) []Destination {
+func getWest(board [][]int, height int, width int, lava Destination, minMoves int, maxMoves int) []Destination {
 	var destinations []Destination
 	moves := 0
 	if lava.direction == West {
 		moves = lava.moves
 	}
 
-	end := lava.pos.x - MaxMoves
+	end := lava.pos.x - maxMoves
 	if end < 0 {
 		end = 0
 	}
@@ -148,11 +150,13 @@ func getWest(board [][]int, height int, width int, lava Destination) []Destinati
 	for x := lava.pos.x - 1; x >= end; x-- {
 		cost += board[lava.pos.y][x]
 		moves++
-		if moves > MaxMoves {
+		if moves > maxMoves {
 			break
 		}
 
-		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: West})
+		if moves > minMoves {
+			destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: West})
+		}
 	}
 
 	return destinations
@@ -173,19 +177,19 @@ func getDirections(direction int) []int {
 	return []int{}
 }
 
-func getDestinations(board [][]int, height int, width int, lava Destination) []Destination {
+func getDestinations(board [][]int, height int, width int, lava Destination, minMoves int, maxMoves int) []Destination {
 	var destinations []Destination
 	directions := getDirections(lava.direction)
 	for i := range directions {
 		switch directions[i] {
 		case North:
-			destinations = append(destinations, getNorth(board, height, width, lava)...)
+			destinations = append(destinations, getNorth(board, height, width, lava, minMoves, maxMoves)...)
 		case East:
-			destinations = append(destinations, getEast(board, height, width, lava)...)
+			destinations = append(destinations, getEast(board, height, width, lava, minMoves, maxMoves)...)
 		case South:
-			destinations = append(destinations, getSouth(board, height, width, lava)...)
+			destinations = append(destinations, getSouth(board, height, width, lava, minMoves, maxMoves)...)
 		case West:
-			destinations = append(destinations, getWest(board, height, width, lava)...)
+			destinations = append(destinations, getWest(board, height, width, lava, minMoves, maxMoves)...)
 		}
 	}
 
@@ -197,7 +201,7 @@ type Visited struct {
 	direction int
 }
 
-func part1(board [][]int) int {
+func calculate(board [][]int, minMoves int, maxMoves int) int {
 	min := 1000000
 	height := len(board)
 	width := len(board[0])
@@ -220,7 +224,7 @@ func part1(board [][]int) int {
 			}
 		}
 
-		successors := getDestinations(board, height, width, current)
+		successors := getDestinations(board, height, width, current, minMoves, maxMoves)
 		for i := range successors {
 			v := Visited{pos: successors[i].pos, direction: successors[i].direction}
 			newCost := successors[i].cost
@@ -248,5 +252,6 @@ func main() {
 	}
 
 	board := readInput(file)
-	fmt.Println("Part1:", part1(board))
+	fmt.Println("Part1:", calculate(board, 0, 3))
+	fmt.Println("Part2:", calculate(board, 3, 10))
 }
