@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 )
 
 const Diff = 48
@@ -30,6 +31,170 @@ func readInput(file *os.File) [][]int {
 	return board
 }
 
+const (
+	North = iota
+	East
+	South
+	West
+)
+
+type Point struct {
+	y, x int
+}
+
+type Destination struct {
+	pos       Point
+	cost      int
+	moves     int
+	direction int
+}
+
+func getNorth(board [][]int, height int, width int, lava Destination) []Destination {
+	var destinations []Destination
+	moves := 3
+	if lava.direction == North {
+		moves = lava.moves
+	}
+
+	end := lava.pos.y - moves
+	if end < 0 {
+		end = 0
+	}
+
+	cost := lava.cost
+	for y := lava.pos.y - 1; y >= end; y-- {
+		cost += board[y][lava.pos.x]
+		moves--
+		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: North})
+	}
+
+	return destinations
+}
+
+func getEast(board [][]int, height int, width int, lava Destination) []Destination {
+	var destinations []Destination
+	moves := 3
+	if lava.direction == East {
+		moves = lava.moves
+	}
+
+	end := lava.pos.x + moves
+	if end >= width {
+		end = width - 1
+	}
+
+	cost := lava.cost
+	for x := lava.pos.x + 1; x <= end; x++ {
+		cost += board[lava.pos.y][x]
+		moves--
+		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: East})
+	}
+
+	return destinations
+}
+
+func getSouth(board [][]int, height int, width int, lava Destination) []Destination {
+	var destinations []Destination
+	moves := 3
+	if lava.direction == South {
+		moves = lava.moves
+	}
+
+	end := lava.pos.y + moves
+	if end >= height {
+		end = height - 1
+	}
+
+	cost := lava.cost
+	for y := lava.pos.y + 1; y <= end; y++ {
+		cost += board[y][lava.pos.x]
+		moves--
+		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: South})
+	}
+
+	return destinations
+}
+
+func getWest(board [][]int, height int, width int, lava Destination) []Destination {
+	var destinations []Destination
+	moves := 3
+	if lava.direction == West {
+		moves = lava.moves
+	}
+
+	end := lava.pos.x - moves
+	if end < 0 {
+		end = 0
+	}
+
+	cost := lava.cost
+	for x := lava.pos.x - 1; x >= end; x-- {
+		cost += board[lava.pos.y][x]
+		moves--
+		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: West})
+	}
+
+	return destinations
+}
+
+func getDestinations(board [][]int, height int, width int, lava Destination) []Destination {
+	var destinations []Destination
+	for i := lava.direction - 1; i <= lava.direction+1; i++ {
+		switch i {
+		case North:
+			destinations = append(destinations, getNorth(board, height, width, lava)...)
+		case East:
+			destinations = append(destinations, getEast(board, height, width, lava)...)
+		case South:
+			destinations = append(destinations, getSouth(board, height, width, lava)...)
+		case West:
+			destinations = append(destinations, getWest(board, height, width, lava)...)
+		}
+	}
+
+	return destinations
+}
+
+func part1(board [][]int) int {
+	min := 1000000
+	height := len(board)
+	width := len(board[0])
+	goal := Point{y: height - 1, x: width - 1}
+	explored := make(map[Point]int)
+	lava := Destination{pos: Point{x: 0, y: 0}, moves: 3, direction: East}
+	frontier := getDestinations(board, height, width, lava)
+
+	for {
+		if len(frontier) == 0 {
+			break
+		}
+
+		sort.Slice(frontier, func(i, j int) bool {
+			return frontier[i].cost < frontier[j].cost
+		})
+
+		current := frontier[0]
+		frontier = frontier[1:]
+
+		if current.pos == goal {
+			if min > current.cost {
+				min = current.cost
+			}
+		}
+
+		successors := getDestinations(board, height, width, current)
+		for i := range successors {
+			value, ok := explored[successors[i].pos]
+			if !ok || value > successors[i].cost {
+				explored[successors[i].pos] = successors[i].cost
+				frontier = append(frontier, successors[i])
+			}
+		}
+	}
+
+	return min
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -43,5 +208,5 @@ func main() {
 	}
 
 	board := readInput(file)
-	fmt.Println(board)
+	fmt.Println("Part1:", part1(board))
 }
