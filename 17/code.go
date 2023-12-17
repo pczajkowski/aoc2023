@@ -8,7 +8,10 @@ import (
 	"sort"
 )
 
-const Diff = 48
+const (
+	Diff     = 48
+	MaxMoves = 3
+)
 
 func readInput(file *os.File) [][]int {
 	scanner := bufio.NewScanner(file)
@@ -51,12 +54,16 @@ type Destination struct {
 
 func getNorth(board [][]int, height int, width int, lava Destination) []Destination {
 	var destinations []Destination
-	moves := 3
+	moves := 0
 	if lava.direction == North {
 		moves = lava.moves
 	}
 
-	end := lava.pos.y - moves
+	if moves > MaxMoves {
+		return destinations
+	}
+
+	end := lava.pos.y - MaxMoves
 	if end < 0 {
 		end = 0
 	}
@@ -64,7 +71,11 @@ func getNorth(board [][]int, height int, width int, lava Destination) []Destinat
 	cost := lava.cost
 	for y := lava.pos.y - 1; y >= end; y-- {
 		cost += board[y][lava.pos.x]
-		moves--
+		moves++
+		if moves > MaxMoves {
+			break
+		}
+
 		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: North})
 	}
 
@@ -73,12 +84,16 @@ func getNorth(board [][]int, height int, width int, lava Destination) []Destinat
 
 func getEast(board [][]int, height int, width int, lava Destination) []Destination {
 	var destinations []Destination
-	moves := 3
+	moves := 0
 	if lava.direction == East {
 		moves = lava.moves
 	}
 
-	end := lava.pos.x + moves
+	if moves > MaxMoves {
+		return destinations
+	}
+
+	end := lava.pos.x + MaxMoves
 	if end >= width {
 		end = width - 1
 	}
@@ -86,8 +101,15 @@ func getEast(board [][]int, height int, width int, lava Destination) []Destinati
 	cost := lava.cost
 	for x := lava.pos.x + 1; x <= end; x++ {
 		cost += board[lava.pos.y][x]
-		moves--
+		moves++
+		if moves > MaxMoves {
+			break
+		}
+
 		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: East})
+		if moves > MaxMoves {
+			break
+		}
 	}
 
 	return destinations
@@ -95,12 +117,16 @@ func getEast(board [][]int, height int, width int, lava Destination) []Destinati
 
 func getSouth(board [][]int, height int, width int, lava Destination) []Destination {
 	var destinations []Destination
-	moves := 3
+	moves := 0
 	if lava.direction == South {
 		moves = lava.moves
 	}
 
-	end := lava.pos.y + moves
+	if moves > MaxMoves {
+		return destinations
+	}
+
+	end := lava.pos.y + MaxMoves
 	if end >= height {
 		end = height - 1
 	}
@@ -108,7 +134,11 @@ func getSouth(board [][]int, height int, width int, lava Destination) []Destinat
 	cost := lava.cost
 	for y := lava.pos.y + 1; y <= end; y++ {
 		cost += board[y][lava.pos.x]
-		moves--
+		moves++
+		if moves > MaxMoves {
+			break
+		}
+
 		destinations = append(destinations, Destination{pos: Point{y: y, x: lava.pos.x}, moves: moves, cost: cost, direction: South})
 	}
 
@@ -117,12 +147,16 @@ func getSouth(board [][]int, height int, width int, lava Destination) []Destinat
 
 func getWest(board [][]int, height int, width int, lava Destination) []Destination {
 	var destinations []Destination
-	moves := 3
+	moves := 0
 	if lava.direction == West {
 		moves = lava.moves
 	}
 
-	end := lava.pos.x - moves
+	if moves > MaxMoves {
+		return destinations
+	}
+
+	end := lava.pos.x - MaxMoves
 	if end < 0 {
 		end = 0
 	}
@@ -130,16 +164,36 @@ func getWest(board [][]int, height int, width int, lava Destination) []Destinati
 	cost := lava.cost
 	for x := lava.pos.x - 1; x >= end; x-- {
 		cost += board[lava.pos.y][x]
-		moves--
+		moves++
+		if moves > MaxMoves {
+			break
+		}
+
 		destinations = append(destinations, Destination{pos: Point{y: lava.pos.y, x: x}, moves: moves, cost: cost, direction: West})
 	}
 
 	return destinations
 }
 
+func getDirections(direction int) []int {
+	switch direction {
+	case North:
+		return []int{West, North, East}
+	case East:
+		return []int{North, East, South}
+	case South:
+		return []int{West, South, East}
+	case West:
+		return []int{South, West, North}
+	}
+
+	return []int{}
+}
+
 func getDestinations(board [][]int, height int, width int, lava Destination) []Destination {
 	var destinations []Destination
-	for i := lava.direction - 1; i <= lava.direction+1; i++ {
+	directions := getDirections(lava.direction)
+	for i := range directions {
 		switch i {
 		case North:
 			destinations = append(destinations, getNorth(board, height, width, lava)...)
@@ -161,21 +215,23 @@ func part1(board [][]int) int {
 	width := len(board[0])
 	goal := Point{y: height - 1, x: width - 1}
 	explored := make(map[Point]int)
-	lava := Destination{pos: Point{x: 0, y: 0}, moves: 3, direction: East}
-	frontier := getDestinations(board, height, width, lava)
+	lava := Destination{pos: Point{x: 0, y: 0}, moves: 0, direction: East}
+	prev := lava
+	frontier := []Destination{lava}
 
 	for {
 		if len(frontier) == 0 {
 			break
 		}
 
-		sort.Slice(frontier, func(i, j int) bool {
-			return frontier[i].cost < frontier[j].cost
-		})
-
 		current := frontier[0]
 		frontier = frontier[1:]
 
+		if current.direction == prev.direction && current.moves+prev.moves > MaxMoves {
+			continue
+		}
+
+		prev = current
 		if current.pos == goal {
 			if min > current.cost {
 				min = current.cost
@@ -183,13 +239,20 @@ func part1(board [][]int) int {
 		}
 
 		successors := getDestinations(board, height, width, current)
+		fmt.Println(current, successors)
 		for i := range successors {
+			newCost := successors[i].cost + successors[i].moves
 			value, ok := explored[successors[i].pos]
-			if !ok || value > successors[i].cost {
-				explored[successors[i].pos] = successors[i].cost
+			if !ok || value > newCost {
+				explored[successors[i].pos] = newCost
 				frontier = append(frontier, successors[i])
 			}
 		}
+
+		sort.Slice(frontier, func(i, j int) bool {
+			return frontier[i].cost < frontier[j].cost
+		})
+
 	}
 
 	return min
