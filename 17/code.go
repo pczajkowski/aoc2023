@@ -192,12 +192,17 @@ func getDestinations(board [][]int, height int, width int, lava Destination) []D
 	return destinations
 }
 
+type Visited struct {
+	pos       Point
+	direction int
+}
+
 func part1(board [][]int) int {
 	min := 1000000
 	height := len(board)
 	width := len(board[0])
 	goal := Point{y: height - 1, x: width - 1}
-	explored := make(map[Point]int)
+	explored := make(map[Visited]int)
 	lava := Destination{pos: Point{x: 0, y: 0}, moves: 0, direction: East}
 	frontier := []Destination{lava}
 
@@ -217,10 +222,11 @@ func part1(board [][]int) int {
 
 		successors := getDestinations(board, height, width, current)
 		for i := range successors {
+			v := Visited{pos: successors[i].pos, direction: successors[i].direction}
 			newCost := successors[i].cost
-			value, ok := explored[successors[i].pos]
+			value, ok := explored[v]
 			if !ok || value > newCost {
-				explored[successors[i].pos] = newCost
+				explored[v] = newCost
 				frontier = append(frontier, successors[i])
 			}
 		}
