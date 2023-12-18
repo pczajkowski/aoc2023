@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -75,6 +76,14 @@ func plot(plan []Dig) []Point {
 	for i := range plan {
 		result = append(result, current.getPoints(plan[i])...)
 	}
+
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].y == result[j].y {
+			return result[i].x < result[j].x
+		}
+
+		return result[i].y < result[j].y
+	})
 
 	return result
 }
