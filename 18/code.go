@@ -49,7 +49,7 @@ const (
 	Right = "R"
 )
 
-func (p *Point) getPoints(dig Dig) []Point {
+func (p *Point) getPoints(dig Dig, wasHere map[Point]bool) []Point {
 	var points []Point
 	for i := 0; i < dig.length; i++ {
 		switch dig.direction {
@@ -63,7 +63,10 @@ func (p *Point) getPoints(dig Dig) []Point {
 			p.x++
 		}
 
-		points = append(points, *p)
+		if !wasHere[*p] {
+			wasHere[*p] = true
+			points = append(points, *p)
+		}
 	}
 
 	return points
@@ -72,9 +75,11 @@ func (p *Point) getPoints(dig Dig) []Point {
 func plot(plan []Dig) []Point {
 	var current Point
 	result := []Point{current}
+	wasHere := make(map[Point]bool)
+	wasHere[current] = true
 
 	for i := range plan {
-		result = append(result, current.getPoints(plan[i])...)
+		result = append(result, current.getPoints(plan[i], wasHere)...)
 	}
 
 	sort.Slice(result, func(i, j int) bool {
@@ -101,5 +106,6 @@ func main() {
 	}
 
 	plan := readInput(file)
-	fmt.Println(plot(plan))
+	plot := plot(plan)
+	fmt.Println(plot, len(plot))
 }
