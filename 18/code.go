@@ -93,6 +93,31 @@ func plot(plan []Dig) []Point {
 	return result
 }
 
+func countBetween(plot []Point) int {
+	var count int
+	edge := len(plot)
+	prev := plot[0]
+	for i := 1; i < edge; i++ {
+		if prev.y == plot[i].y {
+			if prev.x == plot[i].x {
+				continue
+			}
+
+			c := plot[i].x - prev.x - 1
+			fmt.Println(c, plot[i], prev)
+			count += c
+
+			if i+1 < edge {
+				prev = plot[i+1]
+			}
+		} else {
+			prev = plot[i]
+		}
+	}
+
+	return count
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -107,5 +132,5 @@ func main() {
 
 	plan := readInput(file)
 	plot := plot(plan)
-	fmt.Println(plot, len(plot))
+	fmt.Println(countBetween(plot), len(plot))
 }
