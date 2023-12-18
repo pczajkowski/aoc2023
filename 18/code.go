@@ -104,15 +104,14 @@ func countBetween(plot []Point) int {
 			}
 
 			c := plot[i].x - prev.x - 1
-			fmt.Println(c, plot[i], prev)
 			count += c
 
-			if i+1 < edge {
+			if c > 0 && i+1 < edge {
 				prev = plot[i+1]
+				continue
 			}
-		} else {
-			prev = plot[i]
 		}
+		prev = plot[i]
 	}
 
 	return count
@@ -132,5 +131,5 @@ func main() {
 
 	plan := readInput(file)
 	plot := plot(plan)
-	fmt.Println(countBetween(plot), len(plot))
+	fmt.Println("Part1:", countBetween(plot)+len(plot))
 }
