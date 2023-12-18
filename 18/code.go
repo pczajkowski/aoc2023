@@ -37,6 +37,48 @@ func readInput(file *os.File) []Dig {
 	return plan
 }
 
+type Point struct {
+	y, x int
+}
+
+const (
+	Up    = "U"
+	Down  = "D"
+	Left  = "L"
+	Right = "R"
+)
+
+func (p *Point) getPoints(dig Dig) []Point {
+	var points []Point
+	for i := 0; i < dig.length; i++ {
+		switch dig.direction {
+		case Up:
+			p.y--
+		case Down:
+			p.y++
+		case Left:
+			p.x--
+		case Right:
+			p.x++
+		}
+
+		points = append(points, *p)
+	}
+
+	return points
+}
+
+func plot(plan []Dig) []Point {
+	var current Point
+	result := []Point{current}
+
+	for i := range plan {
+		result = append(result, current.getPoints(plan[i])...)
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -50,5 +92,5 @@ func main() {
 	}
 
 	plan := readInput(file)
-	fmt.Println(plan)
+	fmt.Println(plot(plan))
 }
