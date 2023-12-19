@@ -200,6 +200,15 @@ func sortRatings(workflows map[string]Workflow, ratings []Rating) ([]Rating, []R
 	return accepted, rejected
 }
 
+func part1(accepted []Rating) int {
+	var result int
+	for i := range accepted {
+		result += accepted[i].x + accepted[i].m + accepted[i].a + accepted[i].s
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -213,6 +222,6 @@ func main() {
 	}
 
 	workflows, ratings := readInput(file)
-	accepted, rejected := sortRatings(workflows, ratings)
-	fmt.Println(accepted, rejected)
+	accepted, _ := sortRatings(workflows, ratings)
+	fmt.Println("Part1:", part1(accepted))
 }
