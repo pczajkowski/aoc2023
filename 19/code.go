@@ -110,21 +110,41 @@ func parseWorkflow(line string) Workflow {
 	return workflow
 }
 
-func readInput(file *os.File) map[string]Workflow {
+type Rating struct {
+	x, m, a, s int
+}
+
+func readInput(file *os.File) (map[string]Workflow, []Rating) {
 	scanner := bufio.NewScanner(file)
 	workflows := make(map[string]Workflow)
+	var ratings []Rating
+	readingRatings := false
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
+			if !readingRatings {
+				readingRatings = true
+				continue
+			}
+
 			break
 		}
 
-		workflow := parseWorkflow(line)
-		workflows[workflow.id] = workflow
+		if !readingRatings {
+			workflow := parseWorkflow(line)
+			workflows[workflow.id] = workflow
+		} else {
+			var rating Rating
+			n, err := fmt.Sscanf(line, "{x=%d,m=%d,a=%d,s=%d}", &rating.x, &rating.m, &rating.a, &rating.s)
+			if n != 4 || err != nil {
+				log.Fatalf("Bad input for rating: %s\n%s", line, err)
+			}
+			ratings = append(ratings, rating)
+		}
 	}
 
-	return workflows
+	return workflows, ratings
 }
 
 func main() {
@@ -139,6 +159,6 @@ func main() {
 
 	}
 
-	workflows := readInput(file)
-	fmt.Println(workflows)
+	workflows, ratings := readInput(file)
+	fmt.Println(workflows, ratings)
 }
