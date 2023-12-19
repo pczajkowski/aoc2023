@@ -147,6 +147,59 @@ func readInput(file *os.File) (map[string]Workflow, []Rating) {
 	return workflows, ratings
 }
 
+func (n *Node) test(value int) *Node {
+	if n.greater {
+		if value > n.value {
+			return n.right
+		}
+	} else {
+		if value < n.value {
+			return n.right
+		}
+	}
+
+	return n.wrong
+}
+
+func sortRatings(workflows map[string]Workflow, ratings []Rating) ([]Rating, []Rating) {
+	var accepted []Rating
+	var rejected []Rating
+	for i := range ratings {
+		current := workflows["in"].expression
+		for {
+			if current == nil {
+				break
+			}
+			if current.isExpression {
+				switch current.id {
+				case "x":
+					current = current.test(ratings[i].x)
+				case "m":
+					current = current.test(ratings[i].m)
+				case "a":
+					current = current.test(ratings[i].a)
+				case "s":
+					current = current.test(ratings[i].s)
+				default:
+					fmt.Println(current.id, "No match!")
+				}
+			} else {
+				if current.id == "A" {
+					accepted = append(accepted, ratings[i])
+					break
+				} else if current.id == "R" {
+					rejected = append(rejected, ratings[i])
+					break
+				} else {
+					current = workflows[current.id].expression
+				}
+			}
+		}
+	}
+
+	return accepted, rejected
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -160,5 +213,6 @@ func main() {
 	}
 
 	workflows, ratings := readInput(file)
-	fmt.Println(workflows, ratings)
+	accepted, rejected := sortRatings(workflows, ratings)
+	fmt.Println(accepted, rejected)
 }
