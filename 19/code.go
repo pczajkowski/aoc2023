@@ -39,6 +39,7 @@ func parseExpression(text string) []Node {
 			return nodes
 		}
 
+		node.isExpression = true
 		if len(parts) != 2 {
 			log.Fatalf("Can't parse expression: %s", text)
 		}
