@@ -52,19 +52,39 @@ func (p *Point) getDestinations(board [][]byte, height int, width int, maxSteps 
 		return destinations
 	}
 
-	if p.x-1 >= 0 && board[p.y][p.x-1] != Rock {
+	x := (p.x - 1) % width
+	if x < 0 {
+		x = width + x
+	}
+
+	y := p.y % height
+	if y < 0 {
+		y = height + y
+	}
+
+	if board[y][x] != Rock {
 		destinations = append(destinations, Point{y: p.y, x: p.x - 1, steps: p.steps})
 	}
 
-	if p.x+1 < width && board[p.y][p.x+1] != Rock {
+	x = (x + 2) % width
+	if board[y][x] != Rock {
 		destinations = append(destinations, Point{y: p.y, x: p.x + 1, steps: p.steps})
 	}
 
-	if p.y-1 >= 0 && board[p.y-1][p.x] != Rock {
+	x = (x - 1) % width
+	if x < 0 {
+		x = width + x
+	}
+	y = (y - 1) % height
+	if y < 0 {
+		y = height + y
+	}
+	if board[y][x] != Rock {
 		destinations = append(destinations, Point{y: p.y - 1, x: p.x, steps: p.steps})
 	}
 
-	if p.y+1 < height && board[p.y+1][p.x] != Rock {
+	y = (y + 2) % height
+	if board[y][x] != Rock {
 		destinations = append(destinations, Point{y: p.y + 1, x: p.x, steps: p.steps})
 	}
 
@@ -72,7 +92,7 @@ func (p *Point) getDestinations(board [][]byte, height int, width int, maxSteps 
 }
 
 func (p *Point) key() string {
-	return fmt.Sprintf("%d-%d", p.y, p.x)
+	return fmt.Sprintf("%d_%d", p.y, p.x)
 }
 
 func calculate(board [][]byte, start Point, maxSteps int) int {
