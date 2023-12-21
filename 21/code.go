@@ -41,6 +41,68 @@ func readInput(file *os.File) (Point, [][]byte) {
 	return start, board
 }
 
+const (
+	Rock = '#'
+)
+
+func (p *Point) getDestinations(board [][]byte, height int, width int, maxSteps int) []Point {
+	var destinations []Point
+	p.steps++
+	if p.steps > maxSteps {
+		return destinations
+	}
+
+	if p.x-1 >= 0 && board[p.y][p.x-1] != Rock {
+		destinations = append(destinations, Point{y: p.y, x: p.x - 1, steps: p.steps})
+	}
+
+	if p.x+1 < width && board[p.y][p.x+1] != Rock {
+		destinations = append(destinations, Point{y: p.y, x: p.x + 1, steps: p.steps})
+	}
+
+	if p.y-1 >= 0 && board[p.y-1][p.x] != Rock {
+		destinations = append(destinations, Point{y: p.y - 1, x: p.x, steps: p.steps})
+	}
+
+	if p.y+1 < height && board[p.y+1][p.x] != Rock {
+		destinations = append(destinations, Point{y: p.y + 1, x: p.x, steps: p.steps})
+	}
+
+	return destinations
+}
+
+func (p *Point) key() string {
+	return fmt.Sprintf("%d-%d", p.y, p.x)
+}
+
+func calculate(board [][]byte, start Point, maxSteps int) int {
+	height := len(board)
+	width := len(board[0])
+	visited := make(map[string]int)
+	visited[start.key()] = start.steps
+	frontier := []Point{start}
+
+	for {
+		if len(frontier) == 0 {
+			break
+		}
+
+		current := frontier[0]
+		frontier = frontier[1:]
+
+		successors := current.getDestinations(board, height, width, maxSteps)
+		for i := range successors {
+			value, ok := visited[successors[i].key()]
+			if !ok || value > successors[i].steps {
+				visited[successors[i].key()] = successors[i].steps
+				frontier = append(frontier, successors[i])
+			}
+		}
+	}
+
+	return len(visited)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -54,5 +116,5 @@ func main() {
 	}
 
 	start, board := readInput(file)
-	fmt.Println(start, board)
+	fmt.Println(calculate(board, start, 6))
 }
