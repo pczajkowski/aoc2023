@@ -123,5 +123,5 @@ func main() {
 	}
 
 	start, board := readInput(file)
-	fmt.Println("Part1:", calculate(board, start, 6))
+	fmt.Println("Part1:", calculate(board, start, 64))
 }
