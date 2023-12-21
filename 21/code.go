@@ -7,9 +7,16 @@ import (
 	"os"
 )
 
-func readInput(file *os.File) [][]byte {
+type Point struct {
+	y, x  int
+	steps int
+}
+
+func readInput(file *os.File) (Point, [][]byte) {
 	scanner := bufio.NewScanner(file)
 	var board [][]byte
+	var start Point
+	var index int
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -19,13 +26,19 @@ func readInput(file *os.File) [][]byte {
 
 		var row []byte
 		for i := range line {
+			if line[i] == 'S' {
+				start.x = i
+				start.y = index
+			}
+
 			row = append(row, line[i])
 		}
 
 		board = append(board, row)
+		index++
 	}
 
-	return board
+	return start, board
 }
 
 func main() {
@@ -40,6 +53,6 @@ func main() {
 
 	}
 
-	board := readInput(file)
-	fmt.Println(board)
+	start, board := readInput(file)
+	fmt.Println(start, board)
 }
