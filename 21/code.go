@@ -93,14 +93,21 @@ func calculate(board [][]byte, start Point, maxSteps int) int {
 		successors := current.getDestinations(board, height, width, maxSteps)
 		for i := range successors {
 			value, ok := visited[successors[i].key()]
-			if !ok || value > successors[i].steps {
+			if !ok || value < maxSteps && successors[i].steps != value {
 				visited[successors[i].key()] = successors[i].steps
 				frontier = append(frontier, successors[i])
 			}
 		}
 	}
 
-	return len(visited)
+	count := 0
+	for _, v := range visited {
+		if v == maxSteps {
+			count++
+		}
+	}
+
+	return count
 }
 
 func main() {
@@ -116,5 +123,5 @@ func main() {
 	}
 
 	start, board := readInput(file)
-	fmt.Println(calculate(board, start, 6))
+	fmt.Println("Part1:", calculate(board, start, 6))
 }
