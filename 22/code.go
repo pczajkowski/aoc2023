@@ -106,8 +106,7 @@ func part1(objects []Object) int {
 
 func countFallen(object *Object, fallen map[*Object]bool) int {
 	var count int
-	ok, _ := fallen[object]
-	if !ok {
+	if !fallen[object] {
 		fallen[object] = true
 		count++
 	}
