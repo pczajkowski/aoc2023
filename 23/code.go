@@ -68,8 +68,8 @@ func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 		p.direction = North
 		p.mustGoDown = true
 	case Down:
-		p.direction = None
-		p.mustGoDown = false
+		p.direction = South
+		p.mustGoDown = true
 	case Left:
 		p.direction = West
 		p.mustGoDown = true
@@ -79,20 +79,18 @@ func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 	}
 
 	if p.direction != None {
-		x := p.x
-		y := p.y
 		switch p.direction {
 		case North:
-			y--
+			p.y--
 		case South:
-			y++
+			p.y++
 		case West:
-			x--
+			p.x--
 		case East:
-			x++
+			p.x++
 		}
 
-		destinations = append(destinations, Point{y: y, x: x, steps: p.steps})
+		destinations = append(destinations, *p)
 		return destinations
 	}
 
