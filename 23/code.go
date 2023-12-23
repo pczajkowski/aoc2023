@@ -134,8 +134,9 @@ func calculate(board [][]byte) int {
 			break
 		}
 
-		current := frontier[0]
-		frontier = frontier[1:]
+		last := len(frontier) - 1
+		current := frontier[last]
+		frontier = frontier[:last]
 
 		if current.x == goal.x && current.y == goal.y {
 			if max < current.steps {
