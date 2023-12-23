@@ -106,7 +106,7 @@ func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 		destinations = append(destinations, Point{y: p.y - 1, x: p.x, steps: p.steps})
 	}
 
-	if p.y+1 >= 0 && board[p.y+1][p.x] != Rock {
+	if p.y+1 < height && board[p.y+1][p.x] != Rock {
 		destinations = append(destinations, Point{y: p.y + 1, x: p.x, steps: p.steps})
 	}
 
