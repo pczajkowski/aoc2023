@@ -68,7 +68,7 @@ func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 		p.direction = North
 		p.mustGoDown = true
 	case Down:
-		p.direction = South
+		p.direction = None
 		p.mustGoDown = false
 	case Left:
 		p.direction = West
@@ -79,31 +79,33 @@ func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 	}
 
 	if p.direction != None {
+		x := p.x
+		y := p.y
 		switch p.direction {
 		case North:
-			p.y--
+			y--
 		case South:
-			p.y++
+			y++
 		case West:
-			p.x--
+			x--
 		case East:
-			p.x++
+			x++
 		}
 
-		destinations = append(destinations, *p)
+		destinations = append(destinations, Point{y: y, x: x, steps: p.steps})
 		return destinations
 	}
 
-	if p.x-1 >= 0 && board[p.y][p.x-1] != Rock {
-		destinations = append(destinations, Point{y: p.y, x: p.x - 1, steps: p.steps})
+	if p.y-1 >= 0 && board[p.y-1][p.x] != Rock {
+		destinations = append(destinations, Point{y: p.y - 1, x: p.x, steps: p.steps})
 	}
 
 	if p.x+1 < width && board[p.y][p.x+1] != Rock {
 		destinations = append(destinations, Point{y: p.y, x: p.x + 1, steps: p.steps})
 	}
 
-	if p.y-1 >= 0 && board[p.y-1][p.x] != Rock {
-		destinations = append(destinations, Point{y: p.y - 1, x: p.x, steps: p.steps})
+	if p.x-1 >= 0 && board[p.y][p.x-1] != Rock {
+		destinations = append(destinations, Point{y: p.y, x: p.x - 1, steps: p.steps})
 	}
 
 	if p.y+1 < height && board[p.y+1][p.x] != Rock {
@@ -138,7 +140,6 @@ func calculate(board [][]byte) int {
 		frontier = frontier[1:]
 
 		if current.x == goal.x && current.y == goal.y {
-			fmt.Println(current.steps)
 			if max < current.steps {
 				max = current.steps
 			}
@@ -148,8 +149,8 @@ func calculate(board [][]byte) int {
 
 		successors := current.getDestinations(board, height, width)
 		for i := range successors {
-			value, ok := visited[successors[i].key()]
-			if !ok || visited[successors[i].key()] != value {
+			_, ok := visited[successors[i].key()]
+			if !ok {
 				visited[successors[i].key()] = successors[i].steps
 				frontier = append(frontier, successors[i])
 			}
