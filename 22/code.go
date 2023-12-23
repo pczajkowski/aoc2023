@@ -42,11 +42,44 @@ func intersect(a, b Object) bool {
 	return a.xMin <= b.xMax && a.xMax >= b.xMin && a.yMin <= b.yMax && a.yMax >= b.yMin
 }
 
+func process(objects []Object) {
+	sort.Slice(objects, func(i, j int) bool { return objects[i].zMin < objects[j].zMin })
+	endsAt := make(map[int][]*Object)
+
+	for i := range objects {
+		stable := false
+		for z := objects[i].zMin - 1; z > 0; z-- {
+			below := endsAt[z]
+			for j := range below {
+				if intersect(objects[i], *below[j]) {
+					objects[i].zRealMin = z + 1
+					objects[i].zRealMax = objects[i].zRealMin + (objects[i].zMax - objects[i].zMin)
+					objects[i].standsOn = append(objects[i].standsOn, below[j])
+					below[j].supports = append(below[j].supports, &objects[i])
+					if !stable {
+						endsAt[objects[i].zRealMax] = append(endsAt[objects[i].zRealMax], &objects[i])
+					}
+					stable = true
+				}
+			}
+
+			if stable {
+				break
+			}
+		}
+
+		if !stable {
+			objects[i].zRealMin = 1
+			objects[i].zRealMax = objects[i].zRealMin + (objects[i].zMax - objects[i].zMin)
+			endsAt[objects[i].zRealMax] = append(endsAt[objects[i].zRealMax], &objects[i])
+		}
+	}
+}
+
 func part1(objects []Object) int {
 	var result int
-	sort.Slice(objects, func(i, j int) bool { return objects[i].zMin < objects[j].zMin })
+	process(objects)
 	fmt.Println(objects)
-	fmt.Println(objects[1], objects[2], intersect(objects[1], objects[2]))
 
 	return result
 }
