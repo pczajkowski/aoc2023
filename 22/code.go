@@ -14,6 +14,7 @@ type Object struct {
 	zRealMin, zRealMax int
 	supports           []*Object
 	standsOn           []*Object
+	canBeDeleted       bool
 }
 
 func readInput(file *os.File) []Object {
@@ -81,6 +82,7 @@ func part1(objects []Object) int {
 	process(objects)
 	for i := range objects {
 		if len(objects[i].supports) == 0 {
+			objects[i].canBeDeleted = true
 			result++
 			continue
 		}
@@ -94,7 +96,39 @@ func part1(objects []Object) int {
 		}
 
 		if canBeDeleted {
+			objects[i].canBeDeleted = true
 			result++
+		}
+	}
+
+	return result
+}
+
+func countFallen(object *Object, fallen map[*Object]bool) int {
+	var count int
+	ok, _ := fallen[object]
+	if !ok {
+		fallen[object] = true
+		count++
+	}
+
+	for i := range object.supports {
+		count += countFallen(object.supports[i], fallen)
+	}
+
+	return count
+}
+
+func part2(objects []Object) int {
+	var result int
+	for i := range objects {
+		if objects[i].canBeDeleted {
+			continue
+		}
+
+		fallen := make(map[*Object]bool)
+		for j := range objects[i].supports {
+			result += countFallen(objects[i].supports[j], fallen)
 		}
 	}
 
@@ -115,4 +149,5 @@ func main() {
 
 	objects := readInput(file)
 	fmt.Println("Part1:", part1(objects))
+	fmt.Println("Part2:", part2(objects))
 }
