@@ -118,8 +118,8 @@ func calculate(board [][]byte) int {
 
 		successors := current.getDestinations(board, height, width)
 		for i := range successors {
-			_, ok := visited[successors[i].key()]
-			if !ok {
+			value, ok := visited[successors[i].key()]
+			if !ok || visited[successors[i].key()] > value {
 				visited[successors[i].key()] = successors[i].steps
 				frontier = append(frontier, successors[i])
 			}
