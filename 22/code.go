@@ -79,7 +79,24 @@ func process(objects []Object) {
 func part1(objects []Object) int {
 	var result int
 	process(objects)
-	fmt.Println(objects)
+	for i := range objects {
+		if len(objects[i].supports) == 0 {
+			result++
+			continue
+		}
+
+		canBeDeleted := true
+		for j := range objects[i].supports {
+			if len(objects[i].supports[j].standsOn) < 2 {
+				canBeDeleted = false
+				break
+			}
+		}
+
+		if canBeDeleted {
+			result++
+		}
+	}
 
 	return result
 }
