@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 )
 
 type Object struct {
-	xmin, ymin, zmin int
-	xmax, ymax, zmax int
+	xMin, yMin, zMin   int
+	xMax, yMax, zMax   int
+	zRealMin, zRealMax int
+	supports           []*Object
+	standsOn           []*Object
 }
 
-func readInput(file *os.File) (map[int][]Object, map[int][]Object, []Object) {
+func readInput(file *os.File) []Object {
 	scanner := bufio.NewScanner(file)
-	startsAt := make(map[int][]Object)
-	endsAt := make(map[int][]Object)
 	var objects []Object
 
 	for scanner.Scan() {
@@ -25,18 +27,30 @@ func readInput(file *os.File) (map[int][]Object, map[int][]Object, []Object) {
 		}
 
 		var object Object
-		n, err := fmt.Sscanf(line, "%d,%d,%d~%d,%d,%d", &object.xmin, &object.ymin, &object.zmin, &object.xmax, &object.ymax, &object.zmax)
+		n, err := fmt.Sscanf(line, "%d,%d,%d~%d,%d,%d", &object.xMin, &object.yMin, &object.zMin, &object.xMax, &object.yMax, &object.zMax)
 		if n != 6 || err != nil {
 			log.Fatalf("Bad input: %s\n%s", line, err)
 		}
 
-		startsAt[object.zmin] = append(startsAt[object.zmin], object)
-		endsAt[object.zmax] = append(endsAt[object.zmax], object)
 		objects = append(objects, object)
 	}
 
-	return startsAt, endsAt, objects
+	return objects
 }
+
+func intersect(a, b Object) bool {
+	return a.xMin <= b.xMax && a.xMax >= b.xMin && a.yMin <= b.yMax && a.yMax >= b.yMin
+}
+
+func part1(objects []Object) int {
+	var result int
+	sort.Slice(objects, func(i, j int) bool { return objects[i].zMin < objects[j].zMin })
+	fmt.Println(objects)
+	fmt.Println(objects[1], objects[2], intersect(objects[1], objects[2]))
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -49,6 +63,6 @@ func main() {
 
 	}
 
-	startsAt, endsAt, objects := readInput(file)
-	fmt.Println(startsAt, endsAt, objects)
+	objects := readInput(file)
+	fmt.Println("Part1:", part1(objects))
 }
