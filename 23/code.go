@@ -7,9 +7,19 @@ import (
 	"os"
 )
 
+const (
+	None = iota
+	North
+	South
+	East
+	West
+)
+
 type Point struct {
-	y, x  int
-	steps int
+	y, x       int
+	steps      int
+	direction  int
+	mustGoDown bool
 }
 
 func readInput(file *os.File) [][]byte {
@@ -44,23 +54,42 @@ const (
 func (p *Point) getDestinations(board [][]byte, height int, width int) []Point {
 	var destinations []Point
 	p.steps++
-	slope := false
-	switch board[p.y][p.x] {
-	case Up:
-		p.y--
-		slope = true
-	case Down:
+
+	if p.mustGoDown && p.y+1 < height && board[p.y+1][p.x] != Rock {
 		p.y++
-		slope = true
-	case Left:
-		p.x--
-		slope = true
-	case Right:
-		p.x++
-		slope = true
+		p.direction = None
+		p.mustGoDown = false
+		destinations = append(destinations, *p)
+		return destinations
 	}
 
-	if slope {
+	switch board[p.y][p.x] {
+	case Up:
+		p.direction = North
+		p.mustGoDown = true
+	case Down:
+		p.direction = South
+		p.mustGoDown = false
+	case Left:
+		p.direction = West
+		p.mustGoDown = true
+	case Right:
+		p.direction = East
+		p.mustGoDown = true
+	}
+
+	if p.direction != None {
+		switch p.direction {
+		case North:
+			p.y--
+		case South:
+			p.y++
+		case West:
+			p.x--
+		case East:
+			p.x++
+		}
+
 		destinations = append(destinations, *p)
 		return destinations
 	}
@@ -109,6 +138,7 @@ func calculate(board [][]byte) int {
 		frontier = frontier[1:]
 
 		if current.x == goal.x && current.y == goal.y {
+			fmt.Println(current.steps)
 			if max < current.steps {
 				max = current.steps
 			}
@@ -119,7 +149,7 @@ func calculate(board [][]byte) int {
 		successors := current.getDestinations(board, height, width)
 		for i := range successors {
 			value, ok := visited[successors[i].key()]
-			if !ok || visited[successors[i].key()] > value {
+			if !ok || visited[successors[i].key()] != value {
 				visited[successors[i].key()] = successors[i].steps
 				frontier = append(frontier, successors[i])
 			}
