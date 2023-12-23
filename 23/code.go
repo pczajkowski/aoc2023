@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 )
 
 const (
@@ -134,9 +135,8 @@ func calculate(board [][]byte) int {
 			break
 		}
 
-		last := len(frontier) - 1
-		current := frontier[last]
-		frontier = frontier[:last]
+		current := frontier[0]
+		frontier = frontier[1:]
 
 		if current.x == goal.x && current.y == goal.y {
 			if max < current.steps {
@@ -154,6 +154,7 @@ func calculate(board [][]byte) int {
 				frontier = append(frontier, successors[i])
 			}
 		}
+		sort.Slice(frontier, func(i, j int) bool { return frontier[i].steps > frontier[j].steps })
 	}
 
 	return max
